@@ -443,6 +443,9 @@ public class Main {
   /** Output file for the symbol constant class. */
   protected static PrintWriter symbol_class_file;
 
+  /** Output file for dump. */
+  protected static PrintWriter dump_file;
+
   /** Output directory. */
   protected static File dest_dir = null;
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -473,6 +476,15 @@ public class Main {
       System.err.println("Can't open \"" + out_name + "\" for output");
       System.exit(4);
     }
+
+    out_name = "dump.txt";
+    fil = new File(dest_dir, out_name);
+    try {
+      dump_file = new PrintWriter(new BufferedOutputStream(new FileOutputStream(fil), 4096));
+    } catch (Exception e) {
+      System.err.println("Can't open \"" + out_name + "\" for output");
+      System.exit(3);
+    }
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -485,6 +497,8 @@ public class Main {
       parser_class_file.close();
     if (symbol_class_file != null)
       symbol_class_file.close();
+    if (dump_file != null)
+      dump_file.close();
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -497,11 +511,11 @@ public class Main {
    * the code to scan with.
    */
   protected static void parse_grammar_spec() throws java.lang.Exception {
-    parser parser_obj;
+    Parser parser_obj;
 
     /* create a parser and parse with it */
     ComplexSymbolFactory csf = new ComplexSymbolFactory();
-    parser_obj = new parser(new Lexer(csf), csf);
+    parser_obj = new Parser(new Lexer(csf), csf);
     parser_obj.setDebugSymbols(opt_do_debugsymbols);
     try {
       if (opt_do_debug)
@@ -804,36 +818,36 @@ public class Main {
 
   /** Produce a human readable dump of the grammar. */
   public static void dump_grammar() throws internal_error {
-    System.err.println("===== Terminals =====");
+    dump_file.println("===== Terminals =====");
     for (int tidx = 0, cnt = 0; tidx < terminal.number(); tidx++, cnt++) {
-      System.err.print("[" + tidx + "]" + terminal.find(tidx).name() + " ");
+      dump_file.print("[" + tidx + "]" + terminal.find(tidx).name() + " ");
       if ((cnt + 1) % 5 == 0)
-        System.err.println();
+        dump_file.println();
     }
-    System.err.println();
-    System.err.println();
+    dump_file.println();
+    dump_file.println();
 
-    System.err.println("===== Non terminals =====");
+    dump_file.println("===== Non terminals =====");
     for (int nidx = 0, cnt = 0; nidx < non_terminal.number(); nidx++, cnt++) {
-      System.err.print("[" + nidx + "]" + non_terminal.find(nidx).name() + " ");
+      dump_file.print("[" + nidx + "]" + non_terminal.find(nidx).name() + " ");
       if ((cnt + 1) % 5 == 0)
-        System.err.println();
+        dump_file.println();
     }
-    System.err.println();
-    System.err.println();
+    dump_file.println();
+    dump_file.println();
 
-    System.err.println("===== Productions =====");
+    dump_file.println("===== Productions =====");
     for (int pidx = 0; pidx < production.number(); pidx++) {
       production prod = production.find(pidx);
-      System.err.print("[" + pidx + "] " + prod.lhs().the_symbol().name() + " ::= ");
+      dump_file.print("[" + pidx + "] " + prod.lhs().the_symbol().name() + " ::= ");
       for (int i = 0; i < prod.rhs_length(); i++)
         if (prod.rhs(i).is_action())
-          System.err.print("{action} ");
+          dump_file.print("{action} ");
         else
-          System.err.print(((symbol_part) prod.rhs(i)).the_symbol().name() + " ");
-      System.err.println();
+          dump_file.print(((symbol_part) prod.rhs(i)).the_symbol().name() + " ");
+      dump_file.println();
     }
-    System.err.println();
+    dump_file.println();
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -850,12 +864,12 @@ public class Main {
       ordered[st.index()] = st;
     }
 
-    System.err.println("===== Viable Prefix Recognizer =====");
+    dump_file.println("===== Viable Prefix Recognizer =====");
     for (int i = 0; i < lalr_state.number(); i++) {
       if (ordered[i] == start_state)
-        System.err.print("START ");
-      System.err.println(ordered[i]);
-      System.err.println("-------------------");
+        dump_file.print("START ");
+      dump_file.println(ordered[i]);
+      dump_file.println("-------------------");
     }
   }
 
@@ -863,8 +877,8 @@ public class Main {
 
   /** Produce a (semi-) human readable dumps of the parse tables */
   public static void dump_tables() {
-    System.err.println(action_table);
-    System.err.println(reduce_table);
+    dump_file.println(action_table);
+    dump_file.println(reduce_table);
   }
 
   /*-----------------------------------------------------------*/

@@ -1,38 +1,67 @@
 package java_cup;
+
+import java_cup.runtime.Scanner;
 import java_cup.runtime.ComplexSymbolFactory;
 import java_cup.runtime.ComplexSymbolFactory.Location;
 import java_cup.runtime.Symbol;
-import java.lang.Error;
 import java.io.InputStreamReader;
 
 %%
 
-%class Lexer
-%implements sym
-%public
 %unicode
 %line
 %column
-%cup
+
+%public
+%class Lexer
+%implements Scanner
+%function next_token
+%type Symbol
+
 %{
-    public Lexer(ComplexSymbolFactory sf){
-	this(new InputStreamReader(System.in));
-        symbolFactory = sf;
+    public Lexer(ComplexSymbolFactory csf) {
+        this(new InputStreamReader(System.in));
+        symbolFactory = csf;
     }
-    private StringBuffer sb;
+
+    private StringBuilder sb = new StringBuilder();
     private ComplexSymbolFactory symbolFactory;
-    private int csline,cscolumn;
-    public Symbol symbol(String name, int code){
-	return symbolFactory.newSymbol(name, code,new Location(yyline+1,yycolumn+1-yylength()),new Location(yyline+1,yycolumn+1));
+    private int csline, cscolumn;
+
+    public Symbol symbol(String name, int code) {
+        Location xleft = new Location(yyline + 1, yycolumn + 1 - yylength());
+        Location xright = new Location(yyline + 1, yycolumn + 1);
+        return symbolFactory.newSymbol(name, code, xleft, xright);
     }
-    public Symbol symbol(String name, int code, String lexem){
-	return symbolFactory.newSymbol(name, code, new Location(yyline+1, yycolumn +1), new Location(yyline+1,yycolumn+yylength()), lexem);
+
+    public Symbol symbol(String name, int code, String lexeme) {
+        Location xleft = new Location(yyline + 1, yycolumn + 1);
+        Location xright = new Location(yyline + 1, yycolumn + yylength());
+        return symbolFactory.newSymbol(name, code, xleft, xright, lexeme);
     }
-    protected void emit_warning(String message){
-	ErrorManager.getManager().emit_warning("Scanner at " + (yyline+1) + "(" + (yycolumn+1) + "): " + message);
+
+    public void enterCodeSeg() {
+        sb.setLength(0);
+        csline = yyline + 1;
+        cscolumn = yycolumn + 1;
     }
-    protected void emit_error(String message){
-	ErrorManager.getManager().emit_error("Scanner at " + (yyline+1) + "(" + (yycolumn+1) +  "): " + message);
+
+    public Symbol leaveCodeSeg() {
+        Location xleft = new Location(csline, cscolumn);
+        Location xright = new Location(yyline + 1, yycolumn + 1 + yylength());
+        return symbolFactory.newSymbol("CODE_STRING", Symbols.CODE_STRING, xleft, xright, sb.toString());
+    }
+
+    protected String tellPos() {
+        return "(" + (yyline + 1) + ':' + (yycolumn + 1) + ')';
+    }
+
+    protected void emit_warning(String message) {
+        ErrorManager.getManager().emit_warning("Scanner at " + tellPos() + ": " + message);
+    }
+
+    protected void emit_error(String message) {
+        ErrorManager.getManager().emit_error("Scanner at " + tellPos() +  ": " + message);
     }
 %}
 
@@ -49,59 +78,59 @@ ident = ([:jletter:] | "_" ) ([:jletterdigit:] | [:jletter:] | "_" )*
 
 
 %eofval{
-    return symbolFactory.newSymbol("EOF",sym.EOF);
+    return symbol("EOF", Symbols.EOF);
 %eofval}
 
 %state CODESEG
 
-%%  
+%%
 
 <YYINITIAL> {
 
-  {Whitespace}  {                                              }
-  "?"           { return symbol("QESTION",QUESTION);           }
-  ";"           { return symbol("SEMI",SEMI);                  }
-  ","           { return symbol("COMMA",COMMA);                }
-  "*"           { return symbol("STAR",STAR);                  }
-  "."           { return symbol("DOT",DOT);                    }
-  "|"           { return symbol("BAR",BAR);                    }
-  "["           { return symbol("LBRACK",LBRACK);              }
-  "]"           { return symbol("RBRACK",RBRACK);              }
-  ":"           { return symbol("COLON",COLON);                }
-  "::="         { return symbol("COLON_COLON_EQUALS",COLON_COLON_EQUALS);   }
-  "%prec"       { return symbol("PERCENT_PREC",PERCENT_PREC);  }
-  ">"           { return symbol("GT",GT);                      }
-  "<"           { return symbol("LT",LT);                      }
-  {Comment}     {                                              }
-  "{:"          { sb = new StringBuffer(); csline=yyline+1; cscolumn=yycolumn+1; yybegin(CODESEG);    }
-  "package"     { return symbol("PACKAGE",PACKAGE);            } 
-  "import"      { return symbol("IMPORT",IMPORT);	       }
-  "static"      { return symbol("STATIC",STATIC);	       }
-  "class"       { return symbol("CLASS",CLASS); 	       }
-  "code"        { return symbol("CODE",CODE);		       }
-  "action"      { return symbol("ACTION",ACTION);	       }
-  "parser"      { return symbol("PARSER",PARSER);	       }
-  "terminal"    { return symbol("PARSER",TERMINAL);	       }
-  "non"         { return symbol("NON",NON);		       }
-  "nonterminal" { return symbol("NONTERMINAL",NONTERMINAL);    }
-  "init"        { return symbol("INIT",INIT);		       }
-  "scan"        { return symbol("SCAN",SCAN);		       }
-  "with"        { return symbol("WITH",WITH);		       }
-  "start"       { return symbol("START",START);		       }
-  "precedence"  { return symbol("PRECEDENCE",PRECEDENCE);      }
-  "left"        { return symbol("LEFT",LEFT);		       }
-  "right"       { return symbol("RIGHT",RIGHT);		       }
-  "nonassoc"    { return symbol("NONASSOC",NONASSOC);          }
-  "extends"     { return symbol("EXTENDS",EXTENDS);            }
-  "super"       { return symbol("SUPER",SUPER);                }
-  {ident}       { return symbol("ID",ID,yytext());             }
-  
+  {Whitespace}  {                                                                         }
+  "?"           { return symbol("QUESTION", Symbols.QUESTION);                            }
+  ";"           { return symbol("SEMI", Symbols.SEMI);                                    }
+  ","           { return symbol("COMMA", Symbols.COMMA);                                  }
+  "*"           { return symbol("STAR", Symbols.STAR);                                    }
+  "."           { return symbol("DOT", Symbols.DOT);                                      }
+  "|"           { return symbol("BAR", Symbols.BAR);                                      }
+  "["           { return symbol("LBRACK", Symbols.LBRACK);                                }
+  "]"           { return symbol("RBRACK", Symbols.RBRACK);                                }
+  ":"           { return symbol("COLON", Symbols.COLON);                                  }
+  "::="         { return symbol("COLON_COLON_EQUALS", Symbols.COLON_COLON_EQUALS);        }
+  "%prec"       { return symbol("PERCENT_PREC", Symbols.PERCENT_PREC);                    }
+  ">"           { return symbol("GT", Symbols.GT);                                        }
+  "<"           { return symbol("LT", Symbols.LT);                                        }
+  {Comment}     {                                                                         }
+  "{:"          { enterCodeSeg(); yybegin(CODESEG);                                       }
+  "package"     { return symbol("PACKAGE", Symbols.PACKAGE);                              }
+  "import"      { return symbol("IMPORT", Symbols.IMPORT);                                }
+  "static"      { return symbol("STATIC", Symbols.STATIC);                                }
+  "class"       { return symbol("CLASS", Symbols.CLASS);                                  }
+  "code"        { return symbol("CODE", Symbols.CODE);                                    }
+  "action"      { return symbol("ACTION", Symbols.ACTION);                                }
+  "parser"      { return symbol("PARSER", Symbols.PARSER);                                }
+  "terminal"    { return symbol("TERMINAL", Symbols.TERMINAL);                            }
+  "non"         { return symbol("NON", Symbols.NON);                                      }
+  "nonterminal" { return symbol("NONTERMINAL", Symbols.NONTERMINAL);                      }
+  "init"        { return symbol("INIT", Symbols.INIT);                                    }
+  "scan"        { return symbol("SCAN", Symbols.SCAN);                                    }
+  "with"        { return symbol("WITH", Symbols.WITH);                                    }
+  "start"       { return symbol("START", Symbols.START);                                  }
+  "precedence"  { return symbol("PRECEDENCE", Symbols.PRECEDENCE);                        }
+  "left"        { return symbol("LEFT", Symbols.LEFT);                                    }
+  "right"       { return symbol("RIGHT", Symbols.RIGHT);                                  }
+  "nonassoc"    { return symbol("NONASSOC", Symbols.NONASSOC);                            }
+  "extends"     { return symbol("EXTENDS", Symbols.EXTENDS);                              }
+  "super"       { return symbol("SUPER", Symbols.SUPER);                                  }
+  {ident}       { return symbol("ID", Symbols.ID, yytext());                              }
+
 }
 
 <CODESEG> {
-  ":}"         { yybegin(YYINITIAL); return symbolFactory.newSymbol("CODE_STRING",CODE_STRING, new Location(csline, cscolumn),new Location(yyline+1,yycolumn+1+yylength()), sb.toString()); }
-  .|\n            { sb.append(yytext()); }
+  ":}"          { yybegin(YYINITIAL); return leaveCodeSeg();                              }
+  .|\n          { sb.append(yytext());                                                    }
 }
 
 // error fallback
-.|\n          { emit_warning("Unrecognized character '" +yytext()+"' -- ignored"); }
+.|\n            { emit_warning("Unrecognized character '" + yytext() + "' -- ignored");   }

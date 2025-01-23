@@ -69,8 +69,10 @@ public class non_terminal extends symbol {
   public static void clear() {
     _all.clear();
     _all_by_index.clear();
-    next_index = 0;
+    next_index = 1;
     next_nt = 0;
+    _all.put(START_nt._name, START_nt);
+    _all_by_index.put(Integer.valueOf(START_nt._index), START_nt);
   }
 
   /** Access to all non-terminals. */
