@@ -141,7 +141,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
 
     /* if so, merge this lookahead into the original and leave it */
     if (other != null) {
-      other.lookahead().add(itm.lookahead());
+      other.lookahead().addAll(itm.lookahead());
       return other;
     }
     /* otherwise we just go in the set */
@@ -275,7 +275,7 @@ public class lalr_item_set implements Iterable<lalr_item> {
         for (var prod : nt.productions()) {
 
           /* create new item with dot at start and that lookahead */
-          var new_itm = new lalr_item(prod, new terminal_set(new_lookaheads));
+          var new_itm = new lalr_item(prod, new TerminalSet(new_lookaheads));
 
           /* add/merge item into the set */
           var add_itm = add(new_itm);

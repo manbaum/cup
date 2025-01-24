@@ -186,12 +186,12 @@ public class NonTerminal extends Cymbol {
                 /* consider every production of that non terminal */
                 for (production prod : nt.productions()) {
                     /* get the updated first of that production */
-                    terminal_set prod_first = prod.check_first_set();
+                    TerminalSet prod_first = prod.check_first_set();
 
                     /* if this going to add anything, add it */
-                    if (!prod_first.is_subset_of(nt.firstSet)) {
+                    if (!prod_first.isSubsetOf(nt.firstSet)) {
                         change = true;
-                        nt.firstSet.add(prod_first);
+                        nt.firstSet.addAll(prod_first);
                     }
                 }
             }
@@ -244,12 +244,12 @@ public class NonTerminal extends Cymbol {
     /**
      * First set for this non-terminal.
      */
-    protected terminal_set firstSet = new terminal_set();
+    protected TerminalSet firstSet = new TerminalSet();
 
     /**
      * First set for this non-terminal.
      */
-    public terminal_set firstSet() {
+    public TerminalSet firstSet() {
         return firstSet;
     }
 

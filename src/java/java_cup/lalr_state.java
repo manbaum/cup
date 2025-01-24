@@ -439,7 +439,7 @@ public class lalr_state {
    * @param reduce_table the reduce-goto table to put entries in.
    */
   public void build_table_entries(parse_action_table act_table, parse_reduce_table reduce_table) throws internal_error {
-    var conflict_set = new terminal_set();
+    var conflict_set = new TerminalSet();
 
     /* pull out our rows from the tables */
     var our_act_row = act_table.under_state[index()];
@@ -637,7 +637,7 @@ public class lalr_state {
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Produce warning messages for all conflicts found in this state. */
-  protected void report_conflicts(terminal_set conflict_set) throws internal_error {
+  protected void report_conflicts(TerminalSet conflict_set) throws internal_error {
     boolean after_itm;
 
     /* consider each element */
@@ -662,14 +662,14 @@ public class lalr_state {
               /* only look at reduces after itm */
               if (after_itm)
                 /* does the comparison item conflict? */
-                if (compare.lookahead().intersects(itm.lookahead()))
+                if (compare.lookahead().isIntersect(itm.lookahead()))
                   /* report a reduce/reduce conflict */
                   report_reduce_reduce(itm, compare);
             }
           }
         }
         /* report S/R conflicts under all the symbols we conflict under */
-        terminal_set lookahead = itm.lookahead();
+        TerminalSet lookahead = itm.lookahead();
         for (int t = 0; t < Terminal.size(); t++)
           if (conflict_set.contains(t) && lookahead.contains(t))
             report_shift_reduce(itm, t);

@@ -47,7 +47,7 @@ public class lalr_item extends lr_item_core {
    * @param pos  the position of the "dot" within the production.
    * @param look the set of lookahead symbols.
    */
-  public lalr_item(production prod, int pos, terminal_set look) throws internal_error {
+  public lalr_item(production prod, int pos, TerminalSet look) throws internal_error {
     super(prod, pos);
     _lookahead = look;
     _propagate_items = new Stack<>();
@@ -62,7 +62,7 @@ public class lalr_item extends lr_item_core {
    * @param prod the production for the item.
    * @param look the set of lookahead symbols.
    */
-  public lalr_item(production prod, terminal_set look) throws internal_error {
+  public lalr_item(production prod, TerminalSet look) throws internal_error {
     this(prod, 0, look);
   }
 
@@ -74,7 +74,7 @@ public class lalr_item extends lr_item_core {
    * @param prod the production for the item.
    */
   public lalr_item(production prod) throws internal_error {
-    this(prod, 0, new terminal_set());
+    this(prod, 0, new TerminalSet());
   }
 
   /*-----------------------------------------------------------*/
@@ -82,10 +82,10 @@ public class lalr_item extends lr_item_core {
   /*-----------------------------------------------------------*/
 
   /** The lookahead symbols of the item. */
-  protected terminal_set _lookahead;
+  protected TerminalSet _lookahead;
 
   /** The lookahead symbols of the item. */
-  public terminal_set lookahead() {
+  public TerminalSet lookahead() {
     return _lookahead;
   }
 
@@ -124,7 +124,7 @@ public class lalr_item extends lr_item_core {
    * 
    * @params incoming symbols to potentially be added to lookahead of this item.
    */
-  public void propagate_lookaheads(terminal_set incoming) throws internal_error {
+  public void propagate_lookaheads(TerminalSet incoming) throws internal_error {
     boolean change = false;
 
     /* if we don't need to propagate, then bail out now */
@@ -134,7 +134,7 @@ public class lalr_item extends lr_item_core {
     /* if we have null incoming, treat as an empty set */
     if (incoming != null) {
       /* add the incoming to the lookahead of this item */
-      change = lookahead().add(incoming);
+      change = lookahead().addAll(incoming);
     }
 
     /* if we changed or need it anyway, propagate across our links */
@@ -162,7 +162,7 @@ public class lalr_item extends lr_item_core {
       throw new internal_error("Attempt to shift past end of an lalr_item");
 
     /* create the new item w/ the dot shifted by one */
-    result = new lalr_item(the_production(), dot_pos() + 1, new terminal_set(lookahead()));
+    result = new lalr_item(the_production(), dot_pos() + 1, new TerminalSet(lookahead()));
 
     /* change in our lookahead needs to be propagated to this item */
     add_propagate(result);
@@ -177,8 +177,8 @@ public class lalr_item extends lr_item_core {
    * that the dot is currently in front of. Note: this routine must not be invoked
    * before first sets and nullability has been calculated for all non terminals.
    */
-  public terminal_set calc_lookahead(terminal_set lookahead_after) throws internal_error {
-    terminal_set result;
+  public TerminalSet calc_lookahead(TerminalSet lookahead_after) throws internal_error {
+    TerminalSet result;
     int pos;
     production_part part;
     Cymbol sym;
@@ -188,7 +188,7 @@ public class lalr_item extends lr_item_core {
       throw new internal_error("Attempt to calculate a lookahead set with a completed item");
 
     /* start with an empty result */
-    result = new terminal_set();
+    result = new TerminalSet();
 
     /* consider all nullable symbols after the one to the right of the dot */
     for (pos = dot_pos() + 1; pos < the_production().rhs_length(); pos++) {
@@ -204,7 +204,7 @@ public class lalr_item extends lr_item_core {
           return result;
         } else {
           /* otherwise add in first set of the non terminal */
-          result.add(((NonTerminal) sym).firstSet());
+          result.addAll(((NonTerminal) sym).firstSet());
 
           /* if its nullable we continue adding, if not, we are done */
           if (!((NonTerminal) sym).nullable())
@@ -217,7 +217,7 @@ public class lalr_item extends lr_item_core {
      * if we get here everything past the dot was nullable we add in the lookahead
      * for after the production and we are done
      */
-    result.add(lookahead_after);
+    result.addAll(lookahead_after);
     return result;
   }
 

@@ -361,13 +361,13 @@ public class production {
    * First set of the production. This is the set of terminals that could appear
    * at the front of some string derived from this production.
    */
-  protected terminal_set _first_set = new terminal_set();
+  protected TerminalSet _first_set = new TerminalSet();
 
   /**
    * First set of the production. This is the set of terminals that could appear
    * at the front of some string derived from this production.
    */
-  public terminal_set first_set() {
+  public TerminalSet first_set() {
     return _first_set;
   }
 
@@ -651,7 +651,7 @@ public class production {
    * that nullability has already been computed for all non terminals and
    * productions.
    */
-  public terminal_set check_first_set() throws internal_error {
+  public TerminalSet check_first_set() throws internal_error {
     int part;
     Cymbol sym;
 
@@ -664,7 +664,7 @@ public class production {
         /* is it a non-terminal? */
         if (sym.isNonTerm()) {
           /* add in current firsts from that NT */
-          _first_set.add(((NonTerminal) sym).firstSet());
+          _first_set.addAll(((NonTerminal) sym).firstSet());
 
           /* if its not nullable, we are done */
           if (!((NonTerminal) sym).nullable())
