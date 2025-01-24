@@ -18,7 +18,7 @@ public class terminal_set {
   /** Constructor for an empty set. */
   public terminal_set() {
     /* allocate the bitset at what is probably the right size */
-    _elements = new BitSet(terminal.number());
+    _elements = new BitSet(Terminal.size());
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -76,7 +76,7 @@ public class terminal_set {
    * 
    * @param sym the terminal symbol we are looking for.
    */
-  public boolean contains(terminal sym) throws internal_error {
+  public boolean contains(Terminal sym) throws internal_error {
     not_null(sym);
     return _elements.get(sym.index());
   }
@@ -132,7 +132,7 @@ public class terminal_set {
    * @param sym the terminal being added.
    * @return true if this changes the set.
    */
-  public boolean add(terminal sym) throws internal_error {
+  public boolean add(Terminal sym) throws internal_error {
     boolean result;
 
     not_null(sym);
@@ -154,7 +154,7 @@ public class terminal_set {
    * 
    * @param sym the terminal being removed.
    */
-  public void remove(terminal sym) throws internal_error {
+  public void remove(Terminal sym) throws internal_error {
     not_null(sym);
     _elements.clear(sym.index());
   }
@@ -228,14 +228,14 @@ public class terminal_set {
 
     result = "{";
     comma_flag = false;
-    for (int t = 0; t < terminal.number(); t++) {
+    for (int t = 0; t < Terminal.size(); t++) {
       if (_elements.get(t)) {
         if (comma_flag)
           result += ", ";
         else
           comma_flag = true;
 
-        result += terminal.find(t).name();
+        result += Terminal.findByIndex(t).name();
       }
     }
     result += "}";

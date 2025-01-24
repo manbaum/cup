@@ -133,9 +133,9 @@ public class production {
       _rhs[i] = rhs_parts[i];
       if (!_rhs[i].is_action()) {
         ((symbol_part) _rhs[i]).the_symbol().noteUse();
-        if (((symbol_part) _rhs[i]).the_symbol() instanceof terminal) {
-          _rhs_prec = ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_num();
-          _rhs_assoc = ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_side();
+        if (((symbol_part) _rhs[i]).the_symbol() instanceof Terminal) {
+          _rhs_prec = ((Terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence();
+          _rhs_assoc = ((Terminal) ((symbol_part) _rhs[i]).the_symbol()).associativity();
         }
       }
     }
@@ -671,7 +671,7 @@ public class production {
             break;
         } else {
           /* its a terminal -- add that to the set */
-          _first_set.add((terminal) sym);
+          _first_set.add((Terminal) sym);
 
           /* we are done */
           break;

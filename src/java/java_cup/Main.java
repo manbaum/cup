@@ -175,7 +175,7 @@ public class Main {
     start_time = System.currentTimeMillis();
 
     /** clean all static members, that contain remaining stuff from earlier calls */
-    terminal.clear();
+    Terminal.clear();
     production.clear();
     action_production.clear();
     emit.clear();
@@ -541,13 +541,13 @@ public class Main {
   protected static void check_unused() {
 
     /* check for unused terminals */
-    for (var term : terminal.all()) {
+    for (var term : Terminal.all()) {
       /* don't issue a message for EOF */
-      if (term == terminal.EOF)
+      if (term == Terminal.EOF)
         continue;
 
       /* or error */
-      if (term == terminal.error)
+      if (term == Terminal.error)
         continue;
 
       /* is this one unused */
@@ -696,7 +696,7 @@ public class Main {
         + " warning" + plural(ErrorManager.getManager().getWarningCount()));
 
     /* basic stats */
-    System.err.print("  " + terminal.number() + " terminal" + plural(terminal.number()) + ", ");
+    System.err.print("  " + Terminal.size() + " terminal" + plural(Terminal.size()) + ", ");
     System.err.print(non_terminal.number() + " non-terminal" + plural(non_terminal.number()) + ", and ");
     System.err.println(production.number() + " production" + plural(production.number()) + " declared, ");
     System.err.println("  producing " + lalr_state.number() + " unique parse states.");
@@ -819,8 +819,8 @@ public class Main {
   /** Produce a human readable dump of the grammar. */
   public static void dump_grammar() throws internal_error {
     dump_file.println("===== Terminals =====");
-    for (int tidx = 0, cnt = 0; tidx < terminal.number(); tidx++, cnt++) {
-      dump_file.print("[" + tidx + "]" + terminal.find(tidx).name() + " ");
+    for (int tidx = 0, cnt = 0; tidx < Terminal.size(); tidx++, cnt++) {
+      dump_file.print("[" + tidx + "]" + Terminal.findByIndex(tidx).name() + " ");
       if ((cnt + 1) % 5 == 0)
         dump_file.println();
     }

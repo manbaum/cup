@@ -200,7 +200,7 @@ public class lalr_item extends lr_item_core {
 
         /* if its a terminal add it in and we are done */
         if (!sym.isNonTerm()) {
-          result.add((terminal) sym);
+          result.add((Terminal) sym);
           return result;
         } else {
           /* otherwise add in first set of the non terminal */
@@ -313,9 +313,9 @@ public class lalr_item extends lr_item_core {
     res.append(", ");
     if (lookahead() != null) {
       res.append("{");
-      for (int t = 0; t < terminal.number(); t++)
+      for (int t = 0; t < Terminal.size(); t++)
         if (lookahead().contains(t))
-          res.append(terminal.find(t).name() + " ");
+          res.append(Terminal.findByIndex(t).name() + " ");
       res.append("}");
     } else
       res.append("NULL LOOKAHEAD!!");

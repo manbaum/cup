@@ -184,8 +184,8 @@ action code {:
                 System.err.println("Could find terminal " + term + " while declaring precedence");
             } else {
                 java_cup.Cymbol sym = sp.the_symbol();
-                if (sym instanceof terminal) {
-                    ((terminal)sym).set_precedence(_cur_side, _cur_prec);
+                if (sym instanceof Terminal) {
+                    ((Terminal) sym).setAssociativityAndPrecedence(_cur_side, _cur_prec);
                 } else {
                     System.err.println("Precedence declaration: Can't find terminal " + term);
                 }
@@ -274,7 +274,7 @@ start with spec;
 spec ::=
     {:
         /* declare "error" as a terminal */
-        symbols.put("error", new symbol_part(terminal.error));
+        symbols.put("error", new symbol_part(Terminal.error));
 
         /* declare start non terminal */
         non_terms.put("$START", non_terminal.START_nt);
@@ -578,7 +578,7 @@ start_spec ::=
             /* build a special start production */
             new_rhs();
             add_rhs_part(add_lab(new symbol_part(start_nt), "start_val"));
-            add_rhs_part(new symbol_part(terminal.EOF));
+            add_rhs_part(new symbol_part(Terminal.EOF));
             if (!emit._xmlactions) add_rhs_part(new action_part("\t\tRESULT = start_val;"));
             emit.start_production = new production(non_terminal.START_nt, rhs_parts, rhs_pos);
             new_rhs();
@@ -641,11 +641,11 @@ rhs ::=
             }
             /* build the production */
             production p;
-            if (sym instanceof terminal) {
+            if (sym instanceof Terminal) {
                 p = new production(
                     lhs_nt, rhs_parts, rhs_pos,
-                    ((terminal) sym).precedence_num(),
-                    ((terminal) sym).precedence_side());
+                    ((Terminal) sym).precedence(),
+                    ((Terminal) sym).associativity());
                 ((symbol_part) symbols.get(term_name)).the_symbol().noteUse();
             } else {
                 System.err.println(
@@ -662,15 +662,15 @@ rhs ::=
                 /* build a special start production */
                 new_rhs();
                 add_rhs_part(add_lab(new symbol_part(start_nt), "start_val"));
-                add_rhs_part(new symbol_part(terminal.EOF));
+                add_rhs_part(new symbol_part(Terminal.EOF));
                 if (!emit._xmlactions) {
                     add_rhs_part(new action_part("\t\tRESULT = start_val;"));
                 }
-                if (sym instanceof terminal) {
+                if (sym instanceof Terminal) {
                     emit.start_production = new production(
                         non_terminal.START_nt, rhs_parts, rhs_pos,
-                        ((terminal) sym).precedence_num(),
-                        ((terminal) sym).precedence_side());
+                        ((Terminal) sym).precedence(),
+                        ((Terminal) sym).associativity());
                 } else {
                     emit.start_production = new production(non_terminal.START_nt, rhs_parts, rhs_pos);
                 }
@@ -697,7 +697,7 @@ rhs ::=
                 /* build a special start production */
                 new_rhs();
                 add_rhs_part(add_lab(new symbol_part(start_nt), "start_val"));
-                add_rhs_part(new symbol_part(terminal.EOF));
+                add_rhs_part(new symbol_part(Terminal.EOF));
                 if (!emit._xmlactions) {
                     add_rhs_part(new action_part("\t\tRESULT = start_val;"));
                 }
@@ -843,7 +843,7 @@ new_term_id ::=
                 multipart_name = "Object";
             }
             /* build a production_part and put it in the table */
-            symbols.put(term_id, new symbol_part(new terminal(term_id, multipart_name)));
+            symbols.put(term_id, new symbol_part(new Terminal(term_id, multipart_name)));
         }
     :}
     ;

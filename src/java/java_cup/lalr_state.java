@@ -299,7 +299,7 @@ public class lalr_state {
     start_items = new lalr_item_set();
 
     var start_itm = new lalr_item(start_prod);
-    start_itm.lookahead().add(terminal.EOF);
+    start_itm.lookahead().add(Terminal.EOF);
 
     start_items.add(start_itm);
 
@@ -452,7 +452,7 @@ public class lalr_state {
         var act = new reduce_action(itm.the_production());
 
         /* consider each lookahead symbol */
-        for (int t = 0; t < terminal.number(); t++) {
+        for (int t = 0; t < Terminal.size(); t++) {
           /* skip over the ones not in the lookahead */
           if (!itm.lookahead().contains(t))
             continue;
@@ -462,7 +462,7 @@ public class lalr_state {
             our_act_row.under_term[t] = act;
           } else {
             /* we now have at least one conflict */
-            terminal term = terminal.find(t);
+            Terminal term = Terminal.findByIndex(t);
             var other_act = our_act_row.under_term[t];
 
             /* if the other act was not a shift */
@@ -504,7 +504,7 @@ public class lalr_state {
           /* shift always wins */
           if (!fix_with_precedence(p, sym.index(), our_act_row, act)) {
             our_act_row.under_term[sym.index()] = act;
-            conflict_set.add(terminal.find(sym.index()));
+            conflict_set.add(Terminal.findByIndex(sym.index()));
           }
         }
       } else {
@@ -543,19 +543,19 @@ public class lalr_state {
 
       throws internal_error {
 
-    terminal term = terminal.find(term_index);
+    Terminal term = Terminal.findByIndex(term_index);
 
     /* if the production has a precedence number, it can be fixed */
     if (p.precedence_num() > assoc.no_prec) {
 
       /* if production precedes terminal, put reduce in table */
-      if (p.precedence_num() > term.precedence_num()) {
+      if (p.precedence_num() > term.precedence()) {
         table_row.under_term[term_index] = insert_reduce(table_row.under_term[term_index], act);
         return true;
       }
 
       /* if terminal precedes rule, put shift in table */
-      else if (p.precedence_num() < term.precedence_num()) {
+      else if (p.precedence_num() < term.precedence()) {
         table_row.under_term[term_index] = insert_shift(table_row.under_term[term_index], act);
         return true;
       } else { /* they are == precedence */
@@ -564,13 +564,13 @@ public class lalr_state {
          * equal precedences have equal sides, so only need to look at one: if it is
          * right, put shift in table
          */
-        if (term.precedence_side() == assoc.right) {
+        if (term.associativity() == assoc.right) {
           table_row.under_term[term_index] = insert_shift(table_row.under_term[term_index], act);
           return true;
         }
 
         /* if it is left, put reduce in table */
-        else if (term.precedence_side() == assoc.left) {
+        else if (term.associativity() == assoc.left) {
           table_row.under_term[term_index] = insert_reduce(table_row.under_term[term_index], act);
           return true;
         }
@@ -579,7 +579,7 @@ public class lalr_state {
          * if it is nonassoc, we're not allowed to have two nonassocs of equal
          * precedence in a row, so put in NONASSOC
          */
-        else if (term.precedence_side() == assoc.nonassoc) {
+        else if (term.associativity() == assoc.nonassoc) {
           table_row.under_term[term_index] = new nonassoc_action();
           return true;
         } else {
@@ -592,7 +592,7 @@ public class lalr_state {
      * check if terminal has precedence, if so, shift, since rule does not have
      * precedence
      */
-    else if (term.precedence_num() > assoc.no_prec) {
+    else if (term.precedence() > assoc.no_prec) {
       table_row.under_term[term_index] = insert_shift(table_row.under_term[term_index], act);
       return true;
     }
@@ -670,7 +670,7 @@ public class lalr_state {
         }
         /* report S/R conflicts under all the symbols we conflict under */
         terminal_set lookahead = itm.lookahead();
-        for (int t = 0; t < terminal.number(); t++)
+        for (int t = 0; t < Terminal.size(); t++)
           if (conflict_set.contains(t) && lookahead.contains(t))
             report_shift_reduce(itm, t);
       }
@@ -690,13 +690,13 @@ public class lalr_state {
 
     String message = "*** Reduce/Reduce conflict found in state #" + index() + "\n" + "  between "
         + itm1.to_simple_string() + "\n" + "  and     " + itm2.to_simple_string() + "\n" + "  under symbols: {";
-    for (int t = 0; t < terminal.number(); t++) {
+    for (int t = 0; t < Terminal.size(); t++) {
       if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
         if (comma_flag)
           message += (", ");
         else
           comma_flag = true;
-        message += (terminal.find(t).name());
+        message += (Terminal.findByIndex(t).name());
       }
     }
     message += "}\n  Resolved in favor of ";
@@ -741,7 +741,7 @@ public class lalr_state {
         }
       }
     }
-    message += "  under symbol " + terminal.find(conflict_sym).name() + "\n" + "  Resolved in favor of shifting.\n";
+    message += "  under symbol " + Terminal.findByIndex(conflict_sym).name() + "\n" + "  Resolved in favor of shifting.\n";
     if (relevancecounter == 0)
       return;
     /* count the conflict */

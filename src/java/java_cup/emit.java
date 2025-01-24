@@ -327,18 +327,18 @@ public class emit {
     out.println("  /* terminals */");
 
     /* walk over the terminals */ /* later might sort these */
-    for (terminal term : terminal.all()) {
+    for (Terminal term : Terminal.all()) {
       /* output a constant decl for the terminal */
       out.println("  public static final int " + term.name() + " = " + term.index() + ";");
     }
 
     /* Emit names of terminals */
     out.println("  public static final String[] terminalNames = new String[] {");
-    for (int i = 0; i < terminal.number(); i++) {
+    for (int i = 0; i < Terminal.size(); i++) {
       out.print("  \"");
-      out.print(terminal.find(i).name());
+      out.print(Terminal.findByIndex(i).name());
       out.print("\"");
-      if (i < terminal.number() - 1) {
+      if (i < Terminal.size() - 1) {
         out.print(",");
       }
       out.println();
@@ -984,11 +984,11 @@ public class emit {
     /* methods to indicate EOF and error symbol indexes */
     out.println("  /** <code>EOF</code> Symbol index. */");
     out.println("  @Override");
-    out.println("  public int EOF_sym() {return " + terminal.EOF.index() + ";}");
+    out.println("  public int EOF_sym() {return " + Terminal.EOF.index() + ";}");
     out.println();
     out.println("  /** <code>error</code> Symbol index. */");
     out.println("  @Override");
-    out.println("  public int error_sym() {return " + terminal.error.index() + ";}");
+    out.println("  public int error_sym() {return " + Terminal.error.index() + ";}");
     out.println();
 
     /* user supplied code for user_init() */
