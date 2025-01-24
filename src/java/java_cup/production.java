@@ -108,7 +108,7 @@ public class production {
       action_str = declare_str + action_str;
 
     /* count use of lhs */
-    lhs_sym.note_use();
+    lhs_sym.noteUse();
 
     /* create the part for left-hand-side */
     _lhs = new symbol_part(lhs_sym);
@@ -132,7 +132,7 @@ public class production {
     for (i = 0; i < _rhs_length; i++) {
       _rhs[i] = rhs_parts[i];
       if (!_rhs[i].is_action()) {
-        ((symbol_part) _rhs[i]).the_symbol().note_use();
+        ((symbol_part) _rhs[i]).the_symbol().noteUse();
         if (((symbol_part) _rhs[i]).the_symbol() instanceof terminal) {
           _rhs_prec = ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_num();
           _rhs_assoc = ((terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence_side();
@@ -459,7 +459,7 @@ public class production {
         if ((label = part.label()) != null || emit._xmlactions) {
           if (label == null)
             label = part.the_symbol().name() + pos;
-          declaration = declaration + make_declaration(label, part.the_symbol().stack_type(), rhs_len - pos - 1);
+          declaration = declaration + make_declaration(label, part.the_symbol().javaType(), rhs_len - pos - 1);
         }
       }
     }
@@ -579,7 +579,7 @@ public class production {
 
         declare_str = declare_labels(_rhs, act_loc, "");
         /* create a new non terminal for the action production */
-        new_nt = non_terminal.create_new(null, lhs().the_symbol().stack_type()); // TUM 20060608 embedded actions patch
+        new_nt = non_terminal.create_new(null, lhs().the_symbol().javaType()); // TUM 20060608 embedded actions patch
         new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
 
         /* create a new production with just the action */
@@ -602,7 +602,7 @@ public class production {
    */
   public boolean check_nullable() throws internal_error {
     production_part part;
-    symbol sym;
+    Cymbol sym;
     int pos;
 
     /* if we already know bail out early */
@@ -624,7 +624,7 @@ public class production {
         sym = ((symbol_part) part).the_symbol();
 
         /* if its a terminal we are definitely not nullable */
-        if (!sym.is_non_term())
+        if (!sym.isNonTerm())
           return set_nullable(false);
         /* its a non-term, is it marked nullable */
         else if (!((non_terminal) sym).nullable())
@@ -653,7 +653,7 @@ public class production {
    */
   public terminal_set check_first_set() throws internal_error {
     int part;
-    symbol sym;
+    Cymbol sym;
 
     /* walk down the right hand side till we get past all nullables */
     for (part = 0; part < rhs_length(); part++) {
@@ -662,7 +662,7 @@ public class production {
         sym = ((symbol_part) rhs(part)).the_symbol();
 
         /* is it a non-terminal? */
-        if (sym.is_non_term()) {
+        if (sym.isNonTerm()) {
           /* add in current firsts from that NT */
           _first_set.add(((non_terminal) sym).first_set());
 

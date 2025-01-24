@@ -20,7 +20,7 @@ public class symbol_part extends production_part {
    * @param sym the symbol that this part is made up of.
    * @param lab an optional label string for the part.
    */
-  public symbol_part(symbol sym, String lab) throws internal_error {
+  public symbol_part(Cymbol sym, String lab) throws internal_error {
     super(lab);
 
     if (sym == null)
@@ -35,7 +35,7 @@ public class symbol_part extends production_part {
    * 
    * @param sym the symbol that this part is made up of.
    */
-  public symbol_part(symbol sym) throws internal_error {
+  public symbol_part(Cymbol sym) throws internal_error {
     this(sym, null);
   }
 
@@ -44,10 +44,10 @@ public class symbol_part extends production_part {
   /*-----------------------------------------------------------*/
 
   /** The symbol that this part is made up of. */
-  protected symbol _the_symbol;
+  protected Cymbol _the_symbol;
 
   /** The symbol that this part is made up of. */
-  public symbol the_symbol() {
+  public Cymbol the_symbol() {
     return _the_symbol;
   }
 

@@ -551,7 +551,7 @@ public class Main {
         continue;
 
       /* is this one unused */
-      if (term.use_count() == 0) {
+      if (term.useCount() == 0) {
         /* count it and warn if we are doing warnings */
         emit.unused_term++;
         if (!emit.nowarn) {
@@ -563,7 +563,7 @@ public class Main {
     /* check for unused non terminals */
     for (var nt:non_terminal.all()){
       /* is this one unused */
-      if (nt.use_count() == 0) {
+      if (nt.useCount() == 0) {
         /* count and warn if we are doing warnings */
         emit.unused_term++;
         if (!emit.nowarn) {

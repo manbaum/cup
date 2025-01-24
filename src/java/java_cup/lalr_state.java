@@ -233,7 +233,7 @@ public class lalr_state {
    * @param on_sym the symbol the transition is under.
    * @param to_st  the state the transition goes to.
    */
-  public void add_transition(symbol on_sym, lalr_state to_st) throws internal_error {
+  public void add_transition(Cymbol on_sym, lalr_state to_st) throws internal_error {
     /* create a new transition object and put it in our list */
     _transitions = new lalr_transition(on_sym, to_st, _transitions);
   }
@@ -491,7 +491,7 @@ public class lalr_state {
     for (lalr_transition trans = transitions(); trans != null; trans = trans.next()) {
       /* if its on an terminal add a shift entry */
       var sym = trans.on_symbol();
-      if (!sym.is_non_term()) {
+      if (!sym.isNonTerm()) {
         var act = new shift_action(trans.to_state());
 
         /* if we don't already have an action put this one in */
@@ -719,7 +719,7 @@ public class lalr_state {
    * @param conflict_sym the index of the symbol conflict occurs under.
    */
   protected void report_shift_reduce(lalr_item red_itm, int conflict_sym) throws internal_error {
-    symbol shift_sym;
+    Cymbol shift_sym;
 
     /* emit top part of message including the reduce item */
     String message = "*** Shift/Reduce conflict found in state #" + index() + "\n" + "  between "
@@ -734,7 +734,7 @@ public class lalr_state {
 
         /* is it a shift on our conflicting terminal */
         shift_sym = itm.symbol_after_dot();
-        if (!shift_sym.is_non_term() && shift_sym.index() == conflict_sym) {
+        if (!shift_sym.isNonTerm() && shift_sym.index() == conflict_sym) {
           relevancecounter++;
           /* yes, report on it */
           message += "  and     " + itm.to_simple_string() + "\n";

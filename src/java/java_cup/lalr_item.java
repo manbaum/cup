@@ -181,7 +181,7 @@ public class lalr_item extends lr_item_core {
     terminal_set result;
     int pos;
     production_part part;
-    symbol sym;
+    Cymbol sym;
 
     /* sanity check */
     if (dot_at_end())
@@ -199,7 +199,7 @@ public class lalr_item extends lr_item_core {
         sym = ((symbol_part) part).the_symbol();
 
         /* if its a terminal add it in and we are done */
-        if (!sym.is_non_term()) {
+        if (!sym.isNonTerm()) {
           result.add((terminal) sym);
           return result;
         } else {
@@ -233,7 +233,7 @@ public class lalr_item extends lr_item_core {
    */
   public boolean lookahead_visible() throws internal_error {
     production_part part;
-    symbol sym;
+    Cymbol sym;
 
     /*
      * if the dot is at the end, we have a problem, but the cleanest thing to do is
@@ -251,7 +251,7 @@ public class lalr_item extends lr_item_core {
         sym = ((symbol_part) part).the_symbol();
 
         /* if its a terminal we fail */
-        if (!sym.is_non_term())
+        if (!sym.isNonTerm())
           return false;
 
         /* if its not nullable we fail */

@@ -12,7 +12,7 @@ import java.util.Hashtable;
  * @author Scott Hudson
  */
 
-public class non_terminal extends symbol {
+public class non_terminal extends Cymbol {
 
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/
@@ -38,10 +38,10 @@ public class non_terminal extends symbol {
       (new internal_error("Duplicate non-terminal (" + nm + ") created")).crash();
 
     /* assign a unique index */
-    _index = next_index++;
+    index = next_index++;
 
     /* add to by_index set */
-    _all_by_index.put(Integer.valueOf(_index), this);
+    _all_by_index.put(Integer.valueOf(index), this);
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -71,8 +71,8 @@ public class non_terminal extends symbol {
     _all_by_index.clear();
     next_index = 1;
     next_nt = 0;
-    _all.put(START_nt._name, START_nt);
-    _all_by_index.put(Integer.valueOf(START_nt._index), START_nt);
+    _all.put(START_nt.name, START_nt);
+    _all_by_index.put(Integer.valueOf(START_nt.index), START_nt);
   }
 
   /** Access to all non-terminals. */
@@ -267,7 +267,7 @@ public class non_terminal extends symbol {
 
   /** Indicate that this symbol is a non-terminal. */
   @Override
-  public boolean is_non_term() {
+  public boolean isNonTerm() {
     return true;
   }
 

@@ -8,11 +8,11 @@ import java.util.Iterator;
  * This class represents a set of symbols and provides a series of set
  * operations to manipulate them.
  *
- * @see java_cup.symbol
+ * @see Cymbol
  * @version last updated: 11/25/95
  * @author Scott Hudson
  */
-public class symbol_set implements Iterable<symbol> {
+public class symbol_set implements Iterable<Cymbol> {
 
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/
@@ -40,11 +40,11 @@ public class symbol_set implements Iterable<symbol> {
   /**
    * A hash table to hold the set. Symbols are keyed using their name string.
    */
-  protected Hashtable<String, symbol> _all = new Hashtable<>(11);
+  protected Hashtable<String, Cymbol> _all = new Hashtable<>(11);
 
   /** Access to all elements of the set. */
   @Override
-  public Iterator<symbol> iterator() {
+  public Iterator<Cymbol> iterator() {
     return _all.values().iterator();
   }
 
@@ -75,7 +75,7 @@ public class symbol_set implements Iterable<symbol> {
    * 
    * @param sym the symbol we are looking for.
    */
-  public boolean contains(symbol sym) {
+  public boolean contains(Cymbol sym) {
     return _all.containsKey(sym.name());
   }
 
@@ -117,7 +117,7 @@ public class symbol_set implements Iterable<symbol> {
    * @param sym the symbol we are adding.
    * @return true if this changes the set.
    */
-  public boolean add(symbol sym) throws internal_error {
+  public boolean add(Cymbol sym) throws internal_error {
     Object previous;
 
     not_null(sym);
@@ -136,7 +136,7 @@ public class symbol_set implements Iterable<symbol> {
    * 
    * @param sym the symbol we are removing.
    */
-  public void remove(symbol sym) throws internal_error {
+  public void remove(Cymbol sym) throws internal_error {
     not_null(sym);
     _all.remove(sym.name());
   }

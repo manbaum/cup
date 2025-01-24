@@ -107,7 +107,7 @@ public class lr_item_core {
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Cache of symbol after the dot. */
-  protected symbol _symbol_after_dot = null;
+  protected Cymbol _symbol_after_dot = null;
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
@@ -122,7 +122,7 @@ public class lr_item_core {
    * Return the symbol after the dot. If there is no symbol after the dot we
    * return null.
    */
-  public symbol symbol_after_dot() {
+  public Cymbol symbol_after_dot() {
     /* use the cached symbol */
     return _symbol_after_dot;
   }
@@ -134,13 +134,13 @@ public class lr_item_core {
    * null or the non terminal).
    */
   public non_terminal dot_before_nt() {
-    symbol sym;
+    Cymbol sym;
 
     /* get the symbol after the dot */
     sym = symbol_after_dot();
 
     /* if it exists and is a non terminal, return it */
-    if (sym != null && sym.is_non_term())
+    if (sym != null && sym.isNonTerm())
       return (non_terminal) sym;
     else
       return null;

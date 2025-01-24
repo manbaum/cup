@@ -11,7 +11,7 @@ import java.util.Hashtable;
  * @version last updated: 7/3/96
  * @author Frank Flannery
  */
-public class terminal extends symbol {
+public class terminal extends Cymbol {
 
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/
@@ -37,14 +37,14 @@ public class terminal extends symbol {
       (new internal_error("Duplicate terminal (" + nm + ") created")).crash();
 
     /* assign a unique index */
-    _index = next_index++;
+    index = next_index++;
 
     /* set the precedence */
     _precedence_num = precedence_num;
     _precedence_side = precedence_side;
 
     /* add to by_index set */
-    _all_by_index.put(Integer.valueOf(_index), this);
+    _all_by_index.put(Integer.valueOf(index), this);
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
@@ -146,7 +146,7 @@ public class terminal extends symbol {
 
   /** Report this symbol as not being a non-terminal. */
   @Override
-  public boolean is_non_term() {
+  public boolean isNonTerm() {
     return false;
   }
 

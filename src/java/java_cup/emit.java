@@ -445,8 +445,8 @@ public class emit {
         if (prod instanceof action_production) {
           int lastResult = ((action_production) prod).getIndexOfIntermediateResult();
           if (lastResult != -1) {
-            result = emit.pre("stack") +((lastResult == 1) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + (lastResult - 1) + ")"))
-                + ".<"+prod.lhs().the_symbol().stack_type()+">value()";
+            result = emit.pre("stack") + ((lastResult == 1) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + (lastResult - 1) + ")"))
+                     + ".<" + prod.lhs().the_symbol().javaType() + ">value()";
           }
         }
 
@@ -455,7 +455,7 @@ public class emit {
          * make the variable RESULT which will point to the new Symbol (see below) and
          * be changed by action code 6/13/96 frankf
          */
-        out.println("              " + prod.lhs().the_symbol().stack_type() + " RESULT =" + result + ";");
+        out.println("              " + prod.lhs().the_symbol().javaType() + " RESULT =" + result + ";");
 
         /*
          * Add code to propagate RESULT assignments that occur in action code embedded
@@ -465,7 +465,7 @@ public class emit {
           // only interested in non-terminal symbols.
           if (!(prod.rhs(i) instanceof symbol_part))
             continue;
-          symbol s = ((symbol_part) prod.rhs(i)).the_symbol();
+          Cymbol s = ((symbol_part) prod.rhs(i)).the_symbol();
           if (!(s instanceof non_terminal))
             continue;
           // skip this non-terminal unless it corresponds to
@@ -487,8 +487,8 @@ public class emit {
 
           // store the intermediate result into RESULT
           out.println("                " + "RESULT = " + emit.pre("stack") +
-              ((index == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + index + ")")) + 
-              ".<"+prod.lhs().the_symbol().stack_type()+">value();");
+                      ((index == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + index + ")")) +
+                      ".<" + prod.lhs().the_symbol().javaType() + ">value();");
           break;
         }
 
@@ -1107,7 +1107,7 @@ public class emit {
               continue;
             label = sym.the_symbol().name() + rhsi;
           }
-          if (sym.the_symbol().is_non_term())
+          if (sym.the_symbol().isNonTerm())
             nested += ",(XMLElement)" + label;
           else
             nested += ",new XMLElement.Terminal(" + label + "xleft,\"" + label + "\"," + label + "," + label
