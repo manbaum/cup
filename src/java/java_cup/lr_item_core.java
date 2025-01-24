@@ -37,7 +37,7 @@ public class lr_item_core {
    * @param pos  position of the "dot" within the item.
    */
   public lr_item_core(production prod, int pos) throws internal_error {
-    production_part part;
+    ProductionPart part;
 
     if (prod == null)
       throw new internal_error("Attempt to create an lr_item_core with a null production");
@@ -55,8 +55,8 @@ public class lr_item_core {
     /* cache the symbol after the dot */
     if (_dot_pos < _the_production.rhs_length()) {
       part = _the_production.rhs(_dot_pos);
-      if (!part.is_action())
-        _symbol_after_dot = ((symbol_part) part).the_symbol();
+      if (!part.isAction())
+        _symbol_after_dot = ((SymbolPart) part).symbol();
     }
   }
 
@@ -220,11 +220,11 @@ public class lr_item_core {
    */
   public String to_simple_string() throws internal_error {
     String result;
-    production_part part;
+    ProductionPart part;
 
-    if (_the_production.lhs() != null && _the_production.lhs().the_symbol() != null
-        && _the_production.lhs().the_symbol().name() != null)
-      result = _the_production.lhs().the_symbol().name();
+    if (_the_production.lhs() != null && _the_production.lhs().symbol() != null
+        && _the_production.lhs().symbol().name() != null)
+      result = _the_production.lhs().symbol().name();
     else
       result = "$$NULL$$";
 
@@ -242,10 +242,10 @@ public class lr_item_core {
         part = _the_production.rhs(i);
         if (part == null)
           result += "$$NULL$$ ";
-        else if (part.is_action())
+        else if (part.isAction())
           result += "{ACTION} ";
-        else if (((symbol_part) part).the_symbol() != null && ((symbol_part) part).the_symbol().name() != null)
-          result += ((symbol_part) part).the_symbol().name() + " ";
+        else if (((SymbolPart) part).symbol() != null && ((SymbolPart) part).symbol().name() != null)
+          result += ((SymbolPart) part).symbol().name() + " ";
         else
           result += "$$NULL$$ ";
       }

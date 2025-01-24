@@ -21,7 +21,7 @@ public class action_production extends production {
   public action_production(
     production      base,
     NonTerminal lhs_sym,
-    production_part rhs_parts[],
+    ProductionPart rhs_parts[],
     int             rhs_len,
     String          action_str,
     int             indexOfIntermediateResult)

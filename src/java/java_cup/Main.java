@@ -839,12 +839,12 @@ public class Main {
     dump_file.println("===== Productions =====");
     for (int pidx = 0; pidx < production.number(); pidx++) {
       production prod = production.find(pidx);
-      dump_file.print("[" + pidx + "] " + prod.lhs().the_symbol().name() + " ::= ");
+      dump_file.print("[" + pidx + "] " + prod.lhs().symbol().name() + " ::= ");
       for (int i = 0; i < prod.rhs_length(); i++)
-        if (prod.rhs(i).is_action())
+        if (prod.rhs(i).isAction())
           dump_file.print("{action} ");
         else
-          dump_file.print(((symbol_part) prod.rhs(i)).the_symbol().name() + " ");
+          dump_file.print(((SymbolPart) prod.rhs(i)).symbol().name() + " ");
       dump_file.println();
     }
     dump_file.println();

@@ -222,7 +222,7 @@ public class NonTerminal extends Cymbol {
      */
     public void addProduction(production prod) throws internal_error {
         /* catch improper productions */
-        if (prod == null || prod.lhs() == null || prod.lhs().the_symbol() != this)
+        if (prod == null || prod.lhs() == null || prod.lhs().symbol() != this)
             throw new internal_error("Attempt to add invalid production to non terminal production table");
 
         /* add it to the table, keyed with itself */

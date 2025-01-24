@@ -17,9 +17,9 @@ import java.util.Hashtable;
  * (i.e., the set of terminals that could appear at the beginning of some string
  * derived from the production, see check_first_set()).
  * 
- * @see java_cup.production_part
- * @see java_cup.symbol_part
- * @see java_cup.action_part
+ * @see ProductionPart
+ * @see SymbolPart
+ * @see ActionPart
  * @version last updated: 7/3/96
  * @author Frank Flannery
  */
@@ -60,10 +60,10 @@ public class production {
    * actions at the end where they can be handled as part of a reduce by the
    * parser.
    */
-  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str)
+  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, String action_str)
       throws internal_error {
     int i;
-    action_part tail_action;
+    ActionPart tail_action;
     String declare_str;
     int rightlen = rhs_l;
 
@@ -92,7 +92,7 @@ public class production {
      */
 
     if (rhs_l > 0) {
-      if (rhs_parts[rhs_l - 1].is_action()) {
+      if (rhs_parts[rhs_l - 1].isAction()) {
         rightlen = rhs_l - 1;
       } else {
         rightlen = rhs_l;
@@ -111,7 +111,7 @@ public class production {
     lhs_sym.noteUse();
 
     /* create the part for left-hand-side */
-    _lhs = new symbol_part(lhs_sym);
+    _lhs = new SymbolPart(lhs_sym);
 
     /* merge adjacent actions (if any) */
     _rhs_length = merge_adjacent_actions(rhs_parts, _rhs_length);
@@ -128,14 +128,14 @@ public class production {
      */
     /* allocate and copy over the right-hand-side */
     /* count use of each rhs symbol */
-    _rhs = new production_part[_rhs_length];
+    _rhs = new ProductionPart[_rhs_length];
     for (i = 0; i < _rhs_length; i++) {
       _rhs[i] = rhs_parts[i];
-      if (!_rhs[i].is_action()) {
-        ((symbol_part) _rhs[i]).the_symbol().noteUse();
-        if (((symbol_part) _rhs[i]).the_symbol() instanceof Terminal) {
-          _rhs_prec = ((Terminal) ((symbol_part) _rhs[i]).the_symbol()).precedence();
-          _rhs_assoc = ((Terminal) ((symbol_part) _rhs[i]).the_symbol()).associativity();
+      if (!_rhs[i].isAction()) {
+        ((SymbolPart) _rhs[i]).symbol().noteUse();
+        if (((SymbolPart) _rhs[i]).symbol() instanceof Terminal) {
+          _rhs_prec = ((Terminal) ((SymbolPart) _rhs[i]).symbol()).precedence();
+          _rhs_assoc = ((Terminal) ((SymbolPart) _rhs[i]).symbol()).associativity();
         }
       }
     }
@@ -146,11 +146,11 @@ public class production {
      */
     if (action_str == null)
       action_str = "";
-    if (tail_action != null && tail_action.code_string() != null)
-      action_str = action_str + "\t\t" + tail_action.code_string();
+    if (tail_action != null && tail_action.code() != null)
+      action_str = action_str + "\t\t" + tail_action.code();
 
     /* stash the action */
-    _action = new action_part(action_str);
+    _action = new ActionPart(action_str);
 
     /* rewrite production to remove any embedded actions */
     remove_embedded_actions();
@@ -168,7 +168,7 @@ public class production {
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Constructor with no action string. */
-  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l) throws internal_error {
+  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l) throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, null);
   }
 
@@ -178,7 +178,7 @@ public class production {
    * Constructor with precedence and associativity of production contextually
    * define
    */
-  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str, int prec_num,
+  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, String action_str, int prec_num,
                     int prec_side) throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, action_str);
 
@@ -192,7 +192,7 @@ public class production {
   /*
    * Constructor w/ no action string and contextual precedence defined
    */
-  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l, int prec_num, int prec_side)
+  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, int prec_num, int prec_side)
       throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, null);
     /* set the precedence */
@@ -242,10 +242,10 @@ public class production {
   /*-----------------------------------------------------------*/
 
   /** The left hand side non-terminal. */
-  protected symbol_part _lhs;
+  protected SymbolPart _lhs;
 
   /** The left hand side non-terminal. */
-  public symbol_part lhs() {
+  public SymbolPart lhs() {
     return _lhs;
   }
 
@@ -274,10 +274,10 @@ public class production {
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** A collection of parts for the right hand side. */
-  protected production_part _rhs[];
+  protected ProductionPart _rhs[];
 
   /** Access to the collection of parts for the right hand side. */
-  public production_part rhs(int indx) throws internal_error {
+  public ProductionPart rhs(int indx) throws internal_error {
     if (indx >= 0 && indx < _rhs_length)
       return _rhs[indx];
     else
@@ -300,13 +300,13 @@ public class production {
    * An action_part containing code for the action to be performed when we reduce
    * with this production.
    */
-  protected action_part _action;
+  protected ActionPart _action;
 
   /**
    * An action_part containing code for the action to be performed when we reduce
    * with this production.
    */
-  public action_part action() {
+  public ActionPart action() {
     return _action;
   }
 
@@ -444,22 +444,22 @@ public class production {
    * @param final_action the final action string of the production.
    * @param lhs_type     the object type associated with the LHS symbol.
    */
-  protected String declare_labels(production_part rhs[], int rhs_len, String final_action) {
+  protected String declare_labels(ProductionPart rhs[], int rhs_len, String final_action) {
     String declaration = "";
 
-    symbol_part part;
+    SymbolPart part;
     int pos;
 
     /* walk down the parts and extract the labels */
     for (pos = 0; pos < rhs_len; pos++) {
-      if (!rhs[pos].is_action()) {
-        part = (symbol_part) rhs[pos];
+      if (!rhs[pos].isAction()) {
+        part = (SymbolPart) rhs[pos];
         String label;
         /* if it has a label, make declaration! */
         if ((label = part.label()) != null || emit._xmlactions) {
           if (label == null)
-            label = part.the_symbol().name() + pos;
-          declaration = declaration + make_declaration(label, part.the_symbol().javaType(), rhs_len - pos - 1);
+            label = part.symbol().name() + pos;
+          declaration = declaration + make_declaration(label, part.symbol().javaType(), rhs_len - pos - 1);
         }
       }
     }
@@ -475,7 +475,7 @@ public class production {
    * @param len       amount of that array that is valid.
    * @return remaining valid length.
    */
-  protected int merge_adjacent_actions(production_part rhs_parts[], int len) {
+  protected int merge_adjacent_actions(ProductionPart rhs_parts[], int len) {
     int from_loc, to_loc, merge_cnt;
 
     /* bail out early if we have no work to do */
@@ -486,7 +486,7 @@ public class production {
     to_loc = -1;
     for (from_loc = 0; from_loc < len; from_loc++) {
       /* do we go in the current position or one further */
-      if (to_loc < 0 || !rhs_parts[to_loc].is_action() || !rhs_parts[from_loc].is_action()) {
+      if (to_loc < 0 || !rhs_parts[to_loc].isAction() || !rhs_parts[from_loc].isAction()) {
         /* next one */
         to_loc++;
 
@@ -498,10 +498,10 @@ public class production {
       /* if this is not trivial? */
       if (to_loc != from_loc) {
         /* do we merge or copy? */
-        if (rhs_parts[to_loc] != null && rhs_parts[to_loc].is_action() && rhs_parts[from_loc].is_action()) {
+        if (rhs_parts[to_loc] != null && rhs_parts[to_loc].isAction() && rhs_parts[from_loc].isAction()) {
           /* merge */
-          rhs_parts[to_loc] = new action_part(
-              ((action_part) rhs_parts[to_loc]).code_string() + ((action_part) rhs_parts[from_loc]).code_string());
+          rhs_parts[to_loc] = new ActionPart(
+                  ((ActionPart) rhs_parts[to_loc]).code() + ((ActionPart) rhs_parts[from_loc]).code());
           merge_cnt++;
         } else {
           /* copy */
@@ -523,17 +523,17 @@ public class production {
    * @param len       how many of those are valid.
    * @return the removed action part.
    */
-  protected action_part strip_trailing_action(production_part rhs_parts[], int len) {
-    action_part result;
+  protected ActionPart strip_trailing_action(ProductionPart rhs_parts[], int len) {
+    ActionPart result;
 
     /* bail out early if we have nothing to do */
     if (rhs_parts == null || len == 0)
       return null;
 
     /* see if we have a trailing action */
-    if (rhs_parts[len - 1].is_action()) {
+    if (rhs_parts[len - 1].isAction()) {
       /* snip it out and return it */
-      result = (action_part) rhs_parts[len - 1];
+      result = (ActionPart) rhs_parts[len - 1];
       rhs_parts[len - 1] = null;
       return result;
     } else
@@ -575,20 +575,20 @@ public class production {
     int lastLocation = -1;
     /* walk over the production and process each action */
     for (int act_loc = 0; act_loc < rhs_length(); act_loc++)
-      if (rhs(act_loc).is_action()) {
+      if (rhs(act_loc).isAction()) {
 
         declare_str = declare_labels(_rhs, act_loc, "");
         /* create a new non terminal for the action production */
-        new_nt = NonTerminal.createNT(null, lhs().the_symbol().javaType()); // TUM 20060608 embedded actions patch
+        new_nt = NonTerminal.createNT(null, lhs().symbol().javaType()); // TUM 20060608 embedded actions patch
         new_nt.isEmbeddedAction = true; /* 24-Mar-1998, CSA */
 
         /* create a new production with just the action */
         new action_production(this, new_nt, null, 0,
-            declare_str + ((action_part) rhs(act_loc)).code_string(),
+            declare_str + ((ActionPart) rhs(act_loc)).code(),
             lastLocation == -1 ? -1 : act_loc - lastLocation);
 
         /* replace the action with the generated non terminal */
-        _rhs[act_loc] = new symbol_part(new_nt);
+        _rhs[act_loc] = new SymbolPart(new_nt);
         lastLocation = act_loc;
       }
   }
@@ -601,7 +601,7 @@ public class production {
    * is empty or contains only non terminals which themselves are nullable.
    */
   public boolean check_nullable() throws internal_error {
-    production_part part;
+    ProductionPart part;
     Cymbol sym;
     int pos;
 
@@ -620,8 +620,8 @@ public class production {
       part = rhs(pos);
 
       /* only look at non-actions */
-      if (!part.is_action()) {
-        sym = ((symbol_part) part).the_symbol();
+      if (!part.isAction()) {
+        sym = ((SymbolPart) part).symbol();
 
         /* if its a terminal we are definitely not nullable */
         if (!sym.isNonTerm())
@@ -658,8 +658,8 @@ public class production {
     /* walk down the right hand side till we get past all nullables */
     for (part = 0; part < rhs_length(); part++) {
       /* only look at non-actions */
-      if (!rhs(part).is_action()) {
-        sym = ((symbol_part) rhs(part)).the_symbol();
+      if (!rhs(part).isAction()) {
+        sym = ((SymbolPart) rhs(part)).symbol();
 
         /* is it a non-terminal? */
         if (sym.isNonTerm()) {
@@ -727,8 +727,8 @@ public class production {
       for (int i = 0; i < rhs_length(); i++)
         result += rhs(i) + " ";
       result += ";";
-      if (action() != null && action().code_string() != null)
-        result += " {" + action().code_string() + "}";
+      if (action() != null && action().code() != null)
+        result += " {" + action().code() + "}";
 
       if (nullable_known())
         if (nullable())
@@ -753,11 +753,11 @@ public class production {
   public String to_simple_string() throws internal_error {
     String result;
 
-    result = lhs() != null ? lhs().the_symbol().name() : "NULL_LHS";
+    result = lhs() != null ? lhs().symbol().name() : "NULL_LHS";
     result += " ::= ";
     for (int i = 0; i < rhs_length(); i++)
-      if (!rhs(i).is_action())
-        result += ((symbol_part) rhs(i)).the_symbol().name() + " ";
+      if (!rhs(i).isAction())
+        result += ((SymbolPart) rhs(i)).symbol().name() + " ";
 
     return result;
   }

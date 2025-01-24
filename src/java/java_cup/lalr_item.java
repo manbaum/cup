@@ -180,7 +180,7 @@ public class lalr_item extends lr_item_core {
   public TerminalSet calc_lookahead(TerminalSet lookahead_after) throws internal_error {
     TerminalSet result;
     int pos;
-    production_part part;
+    ProductionPart part;
     Cymbol sym;
 
     /* sanity check */
@@ -195,8 +195,8 @@ public class lalr_item extends lr_item_core {
       part = the_production().rhs(pos);
 
       /* consider what kind of production part it is -- skip actions */
-      if (!part.is_action()) {
-        sym = ((symbol_part) part).the_symbol();
+      if (!part.isAction()) {
+        sym = ((SymbolPart) part).symbol();
 
         /* if its a terminal add it in and we are done */
         if (!sym.isNonTerm()) {
@@ -232,7 +232,7 @@ public class lalr_item extends lr_item_core {
    * terminals.
    */
   public boolean lookahead_visible() throws internal_error {
-    production_part part;
+    ProductionPart part;
     Cymbol sym;
 
     /*
@@ -247,8 +247,8 @@ public class lalr_item extends lr_item_core {
       part = the_production().rhs(pos);
 
       /* skip actions */
-      if (!part.is_action()) {
-        sym = ((symbol_part) part).the_symbol();
+      if (!part.isAction()) {
+        sym = ((SymbolPart) part).symbol();
 
         /* if its a terminal we fail */
         if (!sym.isNonTerm())

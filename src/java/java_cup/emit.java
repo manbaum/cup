@@ -446,7 +446,7 @@ public class emit {
           int lastResult = ((action_production) prod).getIndexOfIntermediateResult();
           if (lastResult != -1) {
             result = emit.pre("stack") + ((lastResult == 1) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + (lastResult - 1) + ")"))
-                     + ".<" + prod.lhs().the_symbol().javaType() + ">value()";
+                     + ".<" + prod.lhs().symbol().javaType() + ">value()";
           }
         }
 
@@ -455,7 +455,7 @@ public class emit {
          * make the variable RESULT which will point to the new Symbol (see below) and
          * be changed by action code 6/13/96 frankf
          */
-        out.println("              " + prod.lhs().the_symbol().javaType() + " RESULT =" + result + ";");
+        out.println("              " + prod.lhs().symbol().javaType() + " RESULT =" + result + ";");
 
         /*
          * Add code to propagate RESULT assignments that occur in action code embedded
@@ -463,9 +463,9 @@ public class emit {
          */
         for (int i = prod.rhs_length() - 1; i >= 0; i--) {
           // only interested in non-terminal symbols.
-          if (!(prod.rhs(i) instanceof symbol_part))
+          if (!(prod.rhs(i) instanceof SymbolPart))
             continue;
-          Cymbol s = ((symbol_part) prod.rhs(i)).the_symbol();
+          Cymbol s = ((SymbolPart) prod.rhs(i)).symbol();
           if (!(s instanceof NonTerminal))
             continue;
           // skip this non-terminal unless it corresponds to
@@ -488,13 +488,13 @@ public class emit {
           // store the intermediate result into RESULT
           out.println("                " + "RESULT = " + emit.pre("stack") +
                       ((index == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + index + ")")) +
-                      ".<" + prod.lhs().the_symbol().javaType() + ">value();");
+                      ".<" + prod.lhs().symbol().javaType() + ">value();");
           break;
         }
 
         /* if there is an action string, emit it */
-        if (prod.action() != null && prod.action().code_string() != null && !prod.action().equals(""))
-          out.println(prod.action().code_string());
+        if (prod.action() != null && prod.action().code() != null && !prod.action().equals(""))
+          out.println(prod.action().code());
 
         /*
          * here we have the left and right values being propagated. must make this a
@@ -516,11 +516,11 @@ public class emit {
             leftstring = emit.pre("stack") + ((loffset == 0) ? (".peek()") : (".elementAt(" + emit.pre("top") + "-" + loffset + ")"));
           }
           out.println("              " + pre("result") + " = parser.getSymbolFactory().newSymbol(" + "\""
-              + prod.lhs().the_symbol().name() + "\"," + prod.lhs().the_symbol().index() + ", " + leftstring
-              + ((prod.rhs_length() == 0) ? ("") : (", " + rightstring)) + ", RESULT);");
+                      + prod.lhs().symbol().name() + "\"," + prod.lhs().symbol().index() + ", " + leftstring
+                      + ((prod.rhs_length() == 0) ? ("") : (", " + rightstring)) + ", RESULT);");
         } else {
           out.println("              " + pre("result") + " = parser.getSymbolFactory().newSymbol(" + "\""
-              + prod.lhs().the_symbol().name() + "\"," + prod.lhs().the_symbol().index() + ", RESULT);");
+                      + prod.lhs().symbol().name() + "\"," + prod.lhs().symbol().index() + ", RESULT);");
         }
 
         /* end of their block */
@@ -633,7 +633,7 @@ public class emit {
     for (int i = 0; i < production.number(); i++) {
       var prod = all_prods[i];
       // { lhs symbol , rhs size }
-      prod_table[i][0] = (short) prod.lhs().the_symbol().index();
+      prod_table[i][0] = (short) prod.lhs().symbol().index();
       prod_table[i][1] = (short) prod.rhs_length();
     }
     /* do the top of the table */
@@ -1098,24 +1098,24 @@ public class emit {
         // Generate the XML Output
         String nested = "";
         for (int rhsi = 0; rhsi < prod.rhs_length(); rhsi++) {
-          if (!(prod.rhs(rhsi) instanceof symbol_part))
+          if (!(prod.rhs(rhsi) instanceof SymbolPart))
             continue;
           String label = prod.rhs(rhsi).label();
-          symbol_part sym = (symbol_part) prod.rhs(rhsi);
+          SymbolPart sym = (SymbolPart) prod.rhs(rhsi);
           if (label == null) {
             if (!_genericlabels)
               continue;
-            label = sym.the_symbol().name() + rhsi;
+            label = sym.symbol().name() + rhsi;
           }
-          if (sym.the_symbol().isNonTerm())
+          if (sym.symbol().isNonTerm())
             nested += ",(XMLElement)" + label;
           else
             nested += ",new XMLElement.Terminal(" + label + "xleft,\"" + label + "\"," + label + "," + label
                 + "xright)";
         }
 
-        if (prod.action() != null && prod.action().code_string() != null && !prod.action().equals(""))
-          out.println(prod.action().code_string());
+        if (prod.action() != null && prod.action().code() != null && !prod.action().equals(""))
+          out.println(prod.action().code());
 
         // determine the variant:
         int variant = 0;
@@ -1123,7 +1123,7 @@ public class emit {
           if (production.find(i).lhs().equals(prod.lhs()))
             variant++;
 
-        String lhsname = prod.lhs().the_symbol().name().replace('$', '_');
+        String lhsname = prod.lhs().symbol().name().replace('$', '_');
         out.println(
             "                RESULT = new XMLElement.NonTerminal(\"" + lhsname + "\"," + variant + nested + ");");
 
@@ -1143,11 +1143,11 @@ public class emit {
                 + ((loffset == 0) ? (".peek()") : (".elementAt(" + emit.pre("top") + "-" + loffset + ")"));
           }
           out.println("              " + pre("result") + " = parser.getSymbolFactory().newSymbol(" + "\""
-              + prod.lhs().the_symbol().name() + "\"," + prod.lhs().the_symbol().index() + ", " + leftstring + ", "
-              + rightstring + ", RESULT);");
+                      + prod.lhs().symbol().name() + "\"," + prod.lhs().symbol().index() + ", " + leftstring + ", "
+                      + rightstring + ", RESULT);");
         } else {
           out.println("              " + pre("result") + " = parser.getSymbolFactory().newSymbol(" + "\""
-              + prod.lhs().the_symbol().name() + "\"," + prod.lhs().the_symbol().index() + ", RESULT);");
+                      + prod.lhs().symbol().name() + "\"," + prod.lhs().symbol().index() + ", RESULT);");
         }
 
         /* end of their block */
