@@ -56,8 +56,21 @@
         </fileset>
     </path>
 
-    <property name="cup-bin" location="${bin}/java-cup-11d.jar"/>
-    <property name="ver" value="11s"/>
+    <condition property="cup-ver" value="${env.CUPVER}" else="11">
+        <isset property="env.CUPVER"/>
+    </condition>
+    <condition property="ver" value="${env.VERTAG}" else="11b">
+        <isset property="env.VERTAG"/>
+    </condition>
+
+    <target name="show" depends="init">
+        <echo message="The CUPVER is: ${env.CUPVER}"/>
+        <echo message="The cup-ver is: ${cup-ver}"/>
+        <echo message="The VERTAG is: ${env.VERTAG}"/>
+        <echo message="The ver is: ${ver}"/>
+    </target>
+
+    <property name="cup-bin" location="${bin}/java-cup-${cup-ver}.jar"/>
 
     <target name="clean">
         <delete file="${java}/java_cup/parser.java"/>
