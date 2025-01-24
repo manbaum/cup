@@ -167,7 +167,7 @@ action code {:
     int _cur_prec = 0;
 
     /** Current precedence side */
-    int _cur_side = assoc.no_prec;
+    int _cur_side = Assoc.UNKNOWN;
 
     /** update the precedences we are declaring */
     protected void update_precedence(int p) {
@@ -511,19 +511,19 @@ precedence_l ::= precedence_l preced | preced;
 preced ::=
     PRECEDENCE LEFT
     {:
-        update_precedence(assoc.left);
+        update_precedence(Assoc.LEFT);
     :}
     terminal_list SEMI
     |
     PRECEDENCE RIGHT
     {:
-        update_precedence(assoc.right);
+        update_precedence(Assoc.RIGHT);
     :}
     terminal_list SEMI
     |
     PRECEDENCE NONASSOC
     {:
-        update_precedence(assoc.nonassoc);
+        update_precedence(Assoc.NON_ASSOC);
     :}
     terminal_list SEMI
     ;

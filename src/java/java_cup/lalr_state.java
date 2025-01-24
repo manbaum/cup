@@ -546,7 +546,7 @@ public class lalr_state {
     Terminal term = Terminal.findByIndex(term_index);
 
     /* if the production has a precedence number, it can be fixed */
-    if (p.precedence_num() > assoc.no_prec) {
+    if (p.precedence_num() > Assoc.UNKNOWN) {
 
       /* if production precedes terminal, put reduce in table */
       if (p.precedence_num() > term.precedence()) {
@@ -564,13 +564,13 @@ public class lalr_state {
          * equal precedences have equal sides, so only need to look at one: if it is
          * right, put shift in table
          */
-        if (term.associativity() == assoc.right) {
+        if (term.associativity() == Assoc.RIGHT) {
           table_row.under_term[term_index] = insert_shift(table_row.under_term[term_index], act);
           return true;
         }
 
         /* if it is left, put reduce in table */
-        else if (term.associativity() == assoc.left) {
+        else if (term.associativity() == Assoc.LEFT) {
           table_row.under_term[term_index] = insert_reduce(table_row.under_term[term_index], act);
           return true;
         }
@@ -579,7 +579,7 @@ public class lalr_state {
          * if it is nonassoc, we're not allowed to have two nonassocs of equal
          * precedence in a row, so put in NONASSOC
          */
-        else if (term.associativity() == assoc.nonassoc) {
+        else if (term.associativity() == Assoc.NON_ASSOC) {
           table_row.under_term[term_index] = new nonassoc_action();
           return true;
         } else {
@@ -592,7 +592,7 @@ public class lalr_state {
      * check if terminal has precedence, if so, shift, since rule does not have
      * precedence
      */
-    else if (term.precedence() > assoc.no_prec) {
+    else if (term.precedence() > Assoc.UNKNOWN) {
       table_row.under_term[term_index] = insert_shift(table_row.under_term[term_index], act);
       return true;
     }

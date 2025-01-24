@@ -48,7 +48,7 @@ public class Terminal extends Cymbol {
      * Constructor for non-precedented terminal
      */
     public Terminal(String name, String javaType) {
-        this(name, javaType, assoc.no_prec, -1);
+        this(name, javaType, Assoc.UNKNOWN, -1);
     }
 
     /**
