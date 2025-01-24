@@ -60,7 +60,7 @@ public class production {
    * actions at the end where they can be handled as part of a reduce by the
    * parser.
    */
-  public production(non_terminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str)
+  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str)
       throws internal_error {
     int i;
     action_part tail_action;
@@ -162,13 +162,13 @@ public class production {
     _all.put(Integer.valueOf(_index), this);
 
     /* put us in the production list of the lhs non terminal */
-    lhs_sym.add_production(this);
+    lhs_sym.addProduction(this);
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Constructor with no action string. */
-  public production(non_terminal lhs_sym, production_part rhs_parts[], int rhs_l) throws internal_error {
+  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l) throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, null);
   }
 
@@ -178,8 +178,8 @@ public class production {
    * Constructor with precedence and associativity of production contextually
    * define
    */
-  public production(non_terminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str, int prec_num,
-      int prec_side) throws internal_error {
+  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l, String action_str, int prec_num,
+                    int prec_side) throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, action_str);
 
     /* set the precedence */
@@ -192,7 +192,7 @@ public class production {
   /*
    * Constructor w/ no action string and contextual precedence defined
    */
-  public production(non_terminal lhs_sym, production_part rhs_parts[], int rhs_l, int prec_num, int prec_side)
+  public production(NonTerminal lhs_sym, production_part rhs_parts[], int rhs_l, int prec_num, int prec_side)
       throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, null);
     /* set the precedence */
@@ -570,7 +570,7 @@ public class production {
   protected void remove_embedded_actions(
 
   ) throws internal_error {
-    non_terminal new_nt;
+    NonTerminal new_nt;
     String declare_str;
     int lastLocation = -1;
     /* walk over the production and process each action */
@@ -579,8 +579,8 @@ public class production {
 
         declare_str = declare_labels(_rhs, act_loc, "");
         /* create a new non terminal for the action production */
-        new_nt = non_terminal.create_new(null, lhs().the_symbol().javaType()); // TUM 20060608 embedded actions patch
-        new_nt.is_embedded_action = true; /* 24-Mar-1998, CSA */
+        new_nt = NonTerminal.createNT(null, lhs().the_symbol().javaType()); // TUM 20060608 embedded actions patch
+        new_nt.isEmbeddedAction = true; /* 24-Mar-1998, CSA */
 
         /* create a new production with just the action */
         new action_production(this, new_nt, null, 0,
@@ -627,7 +627,7 @@ public class production {
         if (!sym.isNonTerm())
           return set_nullable(false);
         /* its a non-term, is it marked nullable */
-        else if (!((non_terminal) sym).nullable())
+        else if (!((NonTerminal) sym).nullable())
           /* this one not (yet) nullable, so we aren't */
           return false;
       }
@@ -664,10 +664,10 @@ public class production {
         /* is it a non-terminal? */
         if (sym.isNonTerm()) {
           /* add in current firsts from that NT */
-          _first_set.add(((non_terminal) sym).first_set());
+          _first_set.add(((NonTerminal) sym).firstSet());
 
           /* if its not nullable, we are done */
-          if (!((non_terminal) sym).nullable())
+          if (!((NonTerminal) sym).nullable())
             break;
         } else {
           /* its a terminal -- add that to the set */

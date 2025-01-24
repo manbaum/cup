@@ -351,7 +351,7 @@ public class emit {
       out.println("  /* non terminals */");
 
       /* walk over the non terminals */ /* later might sort these */
-      for (non_terminal nt : non_terminal.all()) {
+      for (NonTerminal nt : NonTerminal.all()) {
 
         // ****
         // TUM Comment: here we could add a typesafe enumeration
@@ -466,11 +466,11 @@ public class emit {
           if (!(prod.rhs(i) instanceof symbol_part))
             continue;
           Cymbol s = ((symbol_part) prod.rhs(i)).the_symbol();
-          if (!(s instanceof non_terminal))
+          if (!(s instanceof NonTerminal))
             continue;
           // skip this non-terminal unless it corresponds to
           // an embedded action production.
-          if (((non_terminal) s).is_embedded_action == false)
+          if (((NonTerminal) s).isEmbeddedAction == false)
             continue;
           // OK, it fits. Make a conditional assignment to RESULT.
           int index = prod.rhs_length() - i - 1; // last rhs is on top.

@@ -204,10 +204,10 @@ public class lalr_item extends lr_item_core {
           return result;
         } else {
           /* otherwise add in first set of the non terminal */
-          result.add(((non_terminal) sym).first_set());
+          result.add(((NonTerminal) sym).firstSet());
 
           /* if its nullable we continue adding, if not, we are done */
-          if (!((non_terminal) sym).nullable())
+          if (!((NonTerminal) sym).nullable())
             return result;
         }
       }
@@ -255,7 +255,7 @@ public class lalr_item extends lr_item_core {
           return false;
 
         /* if its not nullable we fail */
-        if (!((non_terminal) sym).nullable())
+        if (!((NonTerminal) sym).nullable())
           return false;
       }
     }

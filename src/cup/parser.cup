@@ -155,13 +155,13 @@ action code {:
     protected Hashtable<String,production_part> symbols = new Hashtable<>();
 
     /** table of just non terminals -- contains non_terminals indexed by name */
-    protected Hashtable<String,non_terminal> non_terms = new Hashtable<>();
+    protected Hashtable<String, NonTerminal> non_terms = new Hashtable<>();
 
     /** declared start non_terminal */
-    protected non_terminal start_nt = null;
+    protected NonTerminal start_nt = null;
 
     /** left hand side non terminal of the current production */
-    protected non_terminal lhs_nt;
+    protected NonTerminal lhs_nt;
 
     /** Current precedence number */
     int _cur_prec = 0;
@@ -277,7 +277,7 @@ spec ::=
         symbols.put("error", new symbol_part(Terminal.error));
 
         /* declare start non terminal */
-        non_terms.put("$START", non_terminal.START_nt);
+        non_terms.put("$START", NonTerminal.START_NT);
     :}
     package_spec
     import_list
@@ -567,7 +567,7 @@ start_spec ::=
     START WITH nt_id:start_name
     {:
         /* verify that the name has been declared as a non terminal */
-        non_terminal nt = (non_terminal) non_terms.get(start_name);
+        NonTerminal nt = (NonTerminal) non_terms.get(start_name);
         if (nt == null) {
             ErrorManager.getManager().emit_error(
                 "Start non terminal \"" + start_name + "\" has not been declared");
@@ -580,7 +580,7 @@ start_spec ::=
             add_rhs_part(add_lab(new symbol_part(start_nt), "start_val"));
             add_rhs_part(new symbol_part(Terminal.EOF));
             if (!emit._xmlactions) add_rhs_part(new action_part("\t\tRESULT = start_val;"));
-            emit.start_production = new production(non_terminal.START_nt, rhs_parts, rhs_pos);
+            emit.start_production = new production(NonTerminal.START_NT, rhs_parts, rhs_pos);
             new_rhs();
         }
     :}
@@ -599,7 +599,7 @@ production ::=
     nt_id:lhs_id
     {:
         /* lookup the lhs nt */
-        lhs_nt = (non_terminal) non_terms.get(lhs_id);
+        lhs_nt = (NonTerminal) non_terms.get(lhs_id);
 
         /* if it wasn't declared, emit a message */
         if (lhs_nt == null) {
@@ -668,11 +668,11 @@ rhs ::=
                 }
                 if (sym instanceof Terminal) {
                     emit.start_production = new production(
-                        non_terminal.START_nt, rhs_parts, rhs_pos,
+                        NonTerminal.START_NT, rhs_parts, rhs_pos,
                         ((Terminal) sym).precedence(),
                         ((Terminal) sym).associativity());
                 } else {
-                    emit.start_production = new production(non_terminal.START_nt, rhs_parts, rhs_pos);
+                    emit.start_production = new production(NonTerminal.START_NT, rhs_parts, rhs_pos);
                 }
                 new_rhs();
             }
@@ -701,7 +701,7 @@ rhs ::=
                 if (!emit._xmlactions) {
                     add_rhs_part(new action_part("\t\tRESULT = start_val;"));
                 }
-                emit.start_production = new production(non_terminal.START_nt, rhs_parts, rhs_pos);
+                emit.start_production = new production(NonTerminal.START_NT, rhs_parts, rhs_pos);
                 new_rhs();
             }
         }
@@ -863,7 +863,7 @@ new_non_term_id ::=
                 multipart_name ="Object";
             }
             /* build the non terminal object */
-            non_terminal this_nt = new non_terminal(non_term_id, multipart_name);
+            NonTerminal this_nt = new NonTerminal(non_term_id, multipart_name);
 
             /* put it in the non_terms table */
             non_terms.put(non_term_id, this_nt);

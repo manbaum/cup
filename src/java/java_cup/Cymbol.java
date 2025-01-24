@@ -14,7 +14,7 @@ import java.util.Objects;
  * @author Frank Flannery
  * @version last updated: 7/3/96
  * @see Terminal
- * @see java_cup.non_terminal
+ * @see NonTerminal
  */
 public abstract class Cymbol {
 

@@ -133,7 +133,7 @@ public class lr_item_core {
    * Determine if we have a dot before a non terminal, and if so which one (return
    * null or the non terminal).
    */
-  public non_terminal dot_before_nt() {
+  public NonTerminal dot_before_nt() {
     Cymbol sym;
 
     /* get the symbol after the dot */
@@ -141,7 +141,7 @@ public class lr_item_core {
 
     /* if it exists and is a non terminal, return it */
     if (sym != null && sym.isNonTerm())
-      return (non_terminal) sym;
+      return (NonTerminal) sym;
     else
       return null;
   }
