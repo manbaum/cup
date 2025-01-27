@@ -176,7 +176,7 @@ public class Main {
 
     /** clean all static members, that contain remaining stuff from earlier calls */
     Terminal.clear();
-    production.clear();
+    Production.clear();
     action_production.clear();
     emit.clear();
     NonTerminal.clear();
@@ -698,7 +698,7 @@ public class Main {
     /* basic stats */
     System.err.print("  " + Terminal.size() + " terminal" + plural(Terminal.size()) + ", ");
     System.err.print(NonTerminal.size() + " non-terminal" + plural(NonTerminal.size()) + ", and ");
-    System.err.println(production.number() + " production" + plural(production.number()) + " declared, ");
+    System.err.println(Production.number() + " production" + plural(Production.number()) + " declared, ");
     System.err.println("  producing " + lalr_state.number() + " unique parse states.");
 
     /* unused symbols */
@@ -837,8 +837,8 @@ public class Main {
     dump_file.println();
 
     dump_file.println("===== Productions =====");
-    for (int pidx = 0; pidx < production.number(); pidx++) {
-      production prod = production.find(pidx);
+    for (int pidx = 0; pidx < Production.number(); pidx++) {
+      Production prod = Production.find(pidx);
       dump_file.print("[" + pidx + "] " + prod.lhs().symbol().name() + " ::= ");
       for (int i = 0; i < prod.rhs_length(); i++)
         if (prod.rhs(i).isAction())

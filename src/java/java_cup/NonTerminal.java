@@ -166,7 +166,7 @@ public class NonTerminal extends Cymbol {
         }
 
         /* do one last pass over the productions to finalize all of them */
-        for (production prod : production.all())
+        for (Production prod : Production.all())
             prod.set_nullable(prod.check_nullable());
     }
 
@@ -184,7 +184,7 @@ public class NonTerminal extends Cymbol {
             /* consider each non-terminal */
             for (NonTerminal nt : all()) {
                 /* consider every production of that non terminal */
-                for (production prod : nt.productions()) {
+                for (Production prod : nt.productions()) {
                     /* get the updated first of that production */
                     TerminalSet prod_first = prod.check_first_set();
 
@@ -201,12 +201,12 @@ public class NonTerminal extends Cymbol {
     /**
      * Table of all productions with this non terminal on the LHS.
      */
-    protected HashMap<production, production> productions = new HashMap<>(11);
+    protected HashMap<Production, Production> productions = new HashMap<>(11);
 
     /**
      * Access to productions with this non terminal on the LHS.
      */
-    public Iterable<production> productions() {
+    public Iterable<Production> productions() {
         return productions.values();
     }
 
@@ -220,7 +220,7 @@ public class NonTerminal extends Cymbol {
     /**
      * Add a production to our set of productions.
      */
-    public void addProduction(production prod) throws internal_error {
+    public void addProduction(Production prod) throws internal_error {
         /* catch improper productions */
         if (prod == null || prod.lhs() == null || prod.lhs().symbol() != this)
             throw new internal_error("Attempt to add invalid production to non terminal production table");
@@ -266,7 +266,7 @@ public class NonTerminal extends Cymbol {
      */
     protected boolean looksNullable() throws internal_error {
         /* look and see if any of the productions now look nullable */
-        for (production prod : productions())
+        for (Production prod : productions())
             /* if the production can go to empty, we are nullable */
             if (prod.check_nullable())
                 return true;

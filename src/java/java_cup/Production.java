@@ -24,7 +24,7 @@ import java.util.Hashtable;
  * @author Frank Flannery
  */
 
-public class production {
+public class Production {
 
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/
@@ -60,7 +60,7 @@ public class production {
    * actions at the end where they can be handled as part of a reduce by the
    * parser.
    */
-  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, String action_str)
+  public Production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, String action_str)
       throws internal_error {
     int i;
     ActionPart tail_action;
@@ -168,7 +168,7 @@ public class production {
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Constructor with no action string. */
-  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l) throws internal_error {
+  public Production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l) throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, null);
   }
 
@@ -178,7 +178,7 @@ public class production {
    * Constructor with precedence and associativity of production contextually
    * define
    */
-  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, String action_str, int prec_num,
+  public Production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, String action_str, int prec_num,
                     int prec_side) throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, action_str);
 
@@ -192,7 +192,7 @@ public class production {
   /*
    * Constructor w/ no action string and contextual precedence defined
    */
-  public production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, int prec_num, int prec_side)
+  public Production(NonTerminal lhs_sym, ProductionPart rhs_parts[], int rhs_l, int prec_num, int prec_side)
       throws internal_error {
     this(lhs_sym, rhs_parts, rhs_l, null);
     /* set the precedence */
@@ -209,15 +209,15 @@ public class production {
   /**
    * Table of all productions. Elements are stored using their index as the key.
    */
-  protected static Hashtable<Integer, production> _all = new Hashtable<>();
+  protected static Hashtable<Integer, Production> _all = new Hashtable<>();
 
   /** Access to all productions. */
-  public static Iterable<production> all() {
+  public static Iterable<Production> all() {
     return _all.values();
   }
 
   /** Lookup a production by index. */
-  public static production find(int indx) {
+  public static Production find(int indx) {
     return _all.get(Integer.valueOf(indx));
   }
 
@@ -686,7 +686,7 @@ public class production {
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
   /** Equality comparison. */
-  public boolean equals(production other) {
+  public boolean equals(Production other) {
     if (other == null)
       return false;
     return other._index == _index;
@@ -697,10 +697,10 @@ public class production {
   /** Generic equality comparison. */
   @Override
   public boolean equals(Object other) {
-    if (!(other instanceof production))
+    if (!(other instanceof Production))
       return false;
     else
-      return equals((production) other);
+      return equals((Production) other);
   }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */

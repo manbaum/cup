@@ -580,7 +580,7 @@ start_spec ::=
             add_rhs_part(add_lab(new SymbolPart(start_nt), "start_val"));
             add_rhs_part(new SymbolPart(Terminal.EOF));
             if (!emit._xmlactions) add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
-            emit.start_production = new production(NonTerminal.START_NT, rhs_parts, rhs_pos);
+            emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
             new_rhs();
         }
     :}
@@ -640,9 +640,9 @@ rhs ::=
                 sym = ((SymbolPart) symbols.get(term_name)).symbol();
             }
             /* build the production */
-            production p;
+            Production p;
             if (sym instanceof Terminal) {
-                p = new production(
+                p = new Production(
                     lhs_nt, rhs_parts, rhs_pos,
                     ((Terminal) sym).precedence(),
                     ((Terminal) sym).associativity());
@@ -650,7 +650,7 @@ rhs ::=
             } else {
                 System.err.println(
                     "Invalid terminal " + term_name + " for contextual precedence assignment");
-                p = new production(lhs_nt, rhs_parts, rhs_pos);
+                p = new Production(lhs_nt, rhs_parts, rhs_pos);
             }
 
             /* if we have no start non-terminal declared and this is
@@ -667,12 +667,12 @@ rhs ::=
                     add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
                 }
                 if (sym instanceof Terminal) {
-                    emit.start_production = new production(
+                    emit.start_production = new Production(
                         NonTerminal.START_NT, rhs_parts, rhs_pos,
                         ((Terminal) sym).precedence(),
                         ((Terminal) sym).associativity());
                 } else {
-                    emit.start_production = new production(NonTerminal.START_NT, rhs_parts, rhs_pos);
+                    emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
                 }
                 new_rhs();
             }
@@ -686,7 +686,7 @@ rhs ::=
     {:
         if (lhs_nt != null) {
             /* build the production */
-            production p = new production(lhs_nt, rhs_parts, rhs_pos);
+            Production p = new Production(lhs_nt, rhs_parts, rhs_pos);
 
             /* if we have no start non-terminal declared and this is
                the first production, make its lhs nt the start_nt
@@ -701,7 +701,7 @@ rhs ::=
                 if (!emit._xmlactions) {
                     add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
                 }
-                emit.start_production = new production(NonTerminal.START_NT, rhs_parts, rhs_pos);
+                emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
                 new_rhs();
             }
         }

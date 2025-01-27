@@ -47,7 +47,7 @@ public class lalr_item extends lr_item_core {
    * @param pos  the position of the "dot" within the production.
    * @param look the set of lookahead symbols.
    */
-  public lalr_item(production prod, int pos, TerminalSet look) throws internal_error {
+  public lalr_item(Production prod, int pos, TerminalSet look) throws internal_error {
     super(prod, pos);
     _lookahead = look;
     _propagate_items = new Stack<>();
@@ -62,7 +62,7 @@ public class lalr_item extends lr_item_core {
    * @param prod the production for the item.
    * @param look the set of lookahead symbols.
    */
-  public lalr_item(production prod, TerminalSet look) throws internal_error {
+  public lalr_item(Production prod, TerminalSet look) throws internal_error {
     this(prod, 0, look);
   }
 
@@ -73,7 +73,7 @@ public class lalr_item extends lr_item_core {
    * 
    * @param prod the production for the item.
    */
-  public lalr_item(production prod) throws internal_error {
+  public lalr_item(Production prod) throws internal_error {
     this(prod, 0, new TerminalSet());
   }
 
