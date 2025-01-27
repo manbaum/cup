@@ -88,14 +88,14 @@ import java.util.Stack;
  * produce optional time reports in main).
  */
 
-public class emit {
+public class Emit {
 
   /*-----------------------------------------------------------*/
   /*--- Constructor(s) ----------------------------------------*/
   /*-----------------------------------------------------------*/
 
   /** Only constructor is private so no instances can be created. */
-  private emit() {
+  private Emit() {
   }
 
   /*-----------------------------------------------------------*/
@@ -445,7 +445,7 @@ public class emit {
         if (prod instanceof action_production) {
           int lastResult = ((action_production) prod).getIndexOfIntermediateResult();
           if (lastResult != -1) {
-            result = emit.pre("stack") + ((lastResult == 1) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + (lastResult - 1) + ")"))
+            result = Emit.pre("stack") + ((lastResult == 1) ? ".peek()" : (".elementAt(" + Emit.pre("top") + "-" + (lastResult - 1) + ")"))
                      + ".<" + prod.lhs().symbol().javaType() + ">value()";
           }
         }
@@ -486,8 +486,8 @@ public class emit {
           // TUM 20060608: even when its null: who cares?
 
           // store the intermediate result into RESULT
-          out.println("                " + "RESULT = " + emit.pre("stack") +
-                      ((index == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + index + ")")) +
+          out.println("                " + "RESULT = " + Emit.pre("stack") +
+                      ((index == 0) ? ".peek()" : (".elementAt(" + Emit.pre("top") + "-" + index + ")")) +
                       ".<" + prod.lhs().symbol().javaType() + ">value();");
           break;
         }
@@ -505,15 +505,15 @@ public class emit {
          * Create the code that assigns the left and right values of the new Symbol that
          * the production is reducing to
          */
-        if (emit.lr_values()) {
+        if (Emit.lr_values()) {
           int loffset;
           String leftstring, rightstring;
-          rightstring = emit.pre("stack") + ".peek()" ;
+          rightstring = Emit.pre("stack") + ".peek()" ;
           if (prod.rhs_length() == 0)
             leftstring = rightstring;
           else {
             loffset = prod.rhs_length() - 1;
-            leftstring = emit.pre("stack") + ((loffset == 0) ? (".peek()") : (".elementAt(" + emit.pre("top") + "-" + loffset + ")"));
+            leftstring = Emit.pre("stack") + ((loffset == 0) ? (".peek()") : (".elementAt(" + Emit.pre("top") + "-" + loffset + ")"));
           }
           out.println("              " + pre("result") + " = parser.getSymbolFactory().newSymbol(" + "\""
                       + prod.lhs().symbol().name() + "\"," + prod.lhs().symbol().index() + ", " + leftstring
@@ -1131,16 +1131,16 @@ public class emit {
          * Create the code that assigns the left and right values of the new Symbol that
          * the production is reducing to
          */
-        if (emit.lr_values()) {
+        if (Emit.lr_values()) {
           int loffset;
           String leftstring, rightstring;
-          rightstring = emit.pre("stack") + ".peek()";
+          rightstring = Emit.pre("stack") + ".peek()";
           if (prod.rhs_length() == 0)
             leftstring = rightstring;
           else {
             loffset = prod.rhs_length() - 1;
-            leftstring = emit.pre("stack")
-                + ((loffset == 0) ? (".peek()") : (".elementAt(" + emit.pre("top") + "-" + loffset + ")"));
+            leftstring = Emit.pre("stack")
+                         + ((loffset == 0) ? (".peek()") : (".elementAt(" + Emit.pre("top") + "-" + loffset + ")"));
           }
           out.println("              " + pre("result") + " = parser.getSymbolFactory().newSymbol(" + "\""
                       + prod.lhs().symbol().name() + "\"," + prod.lhs().symbol().index() + ", " + leftstring + ", "
@@ -1235,6 +1235,70 @@ public class emit {
     out.println();
 
     action_code_time = System.currentTimeMillis() - start_time;
+  }
+
+  /**
+   * Return label declaration code
+   *
+   * @param labelname  the label name
+   * @param stack_type the stack type of label?
+   * @author frankf
+   */
+  public static String makeDeclaration(String labelname, String stack_type, int offset) {
+    String ret;
+
+    /* Put in the left/right value labels */
+    if (lr_values()) {
+      if (!locations())
+        ret = "\t\tint " + labelname + "left = (" + pre("stack") +
+              // TUM 20050917
+              ((offset == 0) ? ".peek()" : (".elementAt(" + pre("top") + "-" + offset + ")")) + ").left;\n"
+              + "\t\tint " + labelname + "right = (" + pre("stack") +
+              ((offset == 0) ? ".peek()" : (".elementAt(" + pre("top") + "-" + offset + ")")) + ").right;\n";
+      else
+        ret = "\t\tLocation " + labelname + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+              + pre("stack") +
+              ((offset == 0) ? ".peek()" : (".elementAt(" + pre("top") + "-" + offset + ")")) + ").xleft;\n"
+              + "\t\tLocation " + labelname + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
+              + pre("stack") +
+              ((offset == 0) ? ".peek()" : (".elementAt(" + pre("top") + "-" + offset + ")")) + ").xright;\n";
+    } else
+      ret = "";
+
+    /* otherwise, just declare label. */
+    return ret + "\t\t" + stack_type + " " + labelname + " = " + pre("stack") +
+           ((offset == 0) ? ".peek()" : (".elementAt(" + pre("top") + "-" + offset + ")")) + ".<" + stack_type + ">value();\n";
+
+  }
+
+  /**
+   * Declare label names as valid variables within the action string
+   *
+   * @param rhs          array of RHS parts.
+   * @param rhs_len      how much of rhs to consider valid.
+   * @param final_action the final action string of the production.
+   * @param lhs_type     the object type associated with the LHS symbol.
+   */
+  public static String declareLabel(ProductionPart rhs[], int rhs_len, String final_action) {
+    String declaration = "";
+
+    SymbolPart part;
+    int pos;
+
+    /* walk down the parts and extract the labels */
+    for (pos = 0; pos < rhs_len; pos++) {
+      if (!rhs[pos].isAction()) {
+        part = (SymbolPart) rhs[pos];
+        String label;
+        /* if it has a label, make declaration! */
+        if ((label = part.label()) != null || _xmlactions) {
+          if (label == null)
+            label = part.symbol().name() + pos;
+          declaration = declaration + makeDeclaration(label, part.symbol().javaType(), rhs_len - pos - 1);
+        }
+      }
+    }
+    return declaration;
   }
 
   /*-----------------------------------------------------------*/

@@ -100,7 +100,7 @@ public class Production {
     }
 
     /* get the generated declaration code for the necessary labels. */
-    declare_str = declare_labels(rhs_parts, rightlen, action_str);
+    declare_str = Emit.declareLabel(rhs_parts, rightlen, action_str);
 
     if (action_str == null)
       action_str = declare_str;
@@ -401,70 +401,7 @@ public class Production {
   /*--- General Methods ---------------------------------------*/
   /*-----------------------------------------------------------*/
 
-  /**
-   * Return label declaration code
-   * 
-   * @param labelname  the label name
-   * @param stack_type the stack type of label?
-   * @author frankf
-   */
-  protected String make_declaration(String labelname, String stack_type, int offset) {
-    String ret;
-
-    /* Put in the left/right value labels */
-    if (emit.lr_values()) {
-      if (!emit.locations())
-        ret = "\t\tint " + labelname + "left = (" + emit.pre("stack") +
-        // TUM 20050917
-            ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + offset + ")")) + ").left;\n"
-            + "\t\tint " + labelname + "right = (" + emit.pre("stack") +
-            ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + offset + ")")) + ").right;\n";
-      else
-        ret = "\t\tLocation " + labelname + "xleft = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
-            + emit.pre("stack") +
-            ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + offset + ")")) + ").xleft;\n"
-            + "\t\tLocation " + labelname + "xright = ((java_cup.runtime.ComplexSymbolFactory.ComplexSymbol)"
-            + emit.pre("stack") +
-            ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + offset + ")")) + ").xright;\n";
-    } else
-      ret = "";
-
-    /* otherwise, just declare label. */
-    return ret + "\t\t" + stack_type + " " + labelname + " = " + emit.pre("stack") +
-        ((offset == 0) ? ".peek()" : (".elementAt(" + emit.pre("top") + "-" + offset + ")")) + ".<"+stack_type+">value();\n";
-
-  }
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
-
-  /**
-   * Declare label names as valid variables within the action string
-   * 
-   * @param rhs          array of RHS parts.
-   * @param rhs_len      how much of rhs to consider valid.
-   * @param final_action the final action string of the production.
-   * @param lhs_type     the object type associated with the LHS symbol.
-   */
-  protected String declare_labels(ProductionPart rhs[], int rhs_len, String final_action) {
-    String declaration = "";
-
-    SymbolPart part;
-    int pos;
-
-    /* walk down the parts and extract the labels */
-    for (pos = 0; pos < rhs_len; pos++) {
-      if (!rhs[pos].isAction()) {
-        part = (SymbolPart) rhs[pos];
-        String label;
-        /* if it has a label, make declaration! */
-        if ((label = part.label()) != null || emit._xmlactions) {
-          if (label == null)
-            label = part.symbol().name() + pos;
-          declaration = declaration + make_declaration(label, part.symbol().javaType(), rhs_len - pos - 1);
-        }
-      }
-    }
-    return declaration;
-  }
 
   /* . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . */
 
@@ -577,7 +514,7 @@ public class Production {
     for (int act_loc = 0; act_loc < rhs_length(); act_loc++)
       if (rhs(act_loc).isAction()) {
 
-        declare_str = declare_labels(_rhs, act_loc, "");
+        declare_str = Emit.declareLabel(_rhs, act_loc, "");
         /* create a new non terminal for the action production */
         new_nt = NonTerminal.createNT(null, lhs().symbol().javaType()); // TUM 20060608 embedded actions patch
         new_nt.isEmbeddedAction = true; /* 24-Mar-1998, CSA */

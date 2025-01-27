@@ -706,7 +706,7 @@ public class lalr_state {
       message += "the second production.\n";
 
     /* count the conflict */
-    emit.num_conflicts++;
+    Emit.num_conflicts++;
     ErrorManager.getManager().emit_warning(message);
   }
 
@@ -745,7 +745,7 @@ public class lalr_state {
     if (relevancecounter == 0)
       return;
     /* count the conflict */
-    emit.num_conflicts++;
+    Emit.num_conflicts++;
     ErrorManager.getManager().emit_warning(message);
   }
 

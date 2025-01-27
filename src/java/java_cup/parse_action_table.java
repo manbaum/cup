@@ -81,7 +81,7 @@ public class parse_action_table {
          * 
          * /* give a warning if they haven't been turned off
          */
-        if (!emit.nowarn) {
+        if (!Emit.nowarn) {
 
           ErrorManager.getManager().emit_warning("*** Production \"" + prod.to_simple_string() + "\" never reduced");
         }

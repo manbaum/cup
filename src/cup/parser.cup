@@ -307,7 +307,7 @@ package_spec ::=
     multipart_id
     {:
       /* save the package name */
-      emit.package_name = multipart_name;
+      Emit.package_name = multipart_name;
 
       /* reset the accumulated multipart name */
       multipart_name = "";
@@ -333,7 +333,7 @@ import_spec ::=
     import_id
     {:
         /* save this import on the imports list */
-        emit.import_list.push(multipart_name);
+        Emit.import_list.push(multipart_name);
 
         /* reset the accumulated multipart name */
         multipart_name = "";
@@ -344,7 +344,7 @@ import_spec ::=
     import_id
     {:
         /* save this import on the imports list */
-        emit.import_list.push(" static " + multipart_name);
+        Emit.import_list.push(" static " + multipart_name);
 
         /* reset the accumulated multipart name */
         multipart_name = "";
@@ -357,8 +357,8 @@ class_name ::=
     |
     CLASS ID:id SEMI
     {:
-        emit.parser_class_name = id;
-        emit.symbol_const_class_name = id + "Sym";
+        Emit.parser_class_name = id;
+        Emit.symbol_const_class_name = id + "Sym";
     :}
     ;
 
@@ -376,10 +376,10 @@ code_parts ::=
 action_code_part ::=
     ACTION CODE CODE_STRING:user_code opt_semi
     {:
-        if (emit.action_code != null) {
+        if (Emit.action_code != null) {
             ErrorManager.getManager().emit_warning("Redundant action code (skipping)");
         } else { /* save the user included code string */
-            emit.action_code = attach_debug_symbol(get_new_debug_id(), user_code);
+            Emit.action_code = attach_debug_symbol(get_new_debug_id(), user_code);
         }
     :}
     ;
@@ -389,10 +389,10 @@ action_code_part ::=
 parser_code_part ::=
     PARSER CODE CODE_STRING:user_code opt_semi
     {:
-        if (emit.parser_code != null) {
+        if (Emit.parser_code != null) {
             ErrorManager.getManager().emit_warning("Redundant parser code (skipping)");
         } else { /* save the user included code string */
-            emit.parser_code = attach_debug_symbol(get_new_debug_id(), user_code);
+            Emit.parser_code = attach_debug_symbol(get_new_debug_id(), user_code);
         }
     :}
     ;
@@ -402,10 +402,10 @@ parser_code_part ::=
 init_code ::=
     INIT WITH CODE_STRING:user_code opt_semi
     {:
-        if (emit.init_code != null) {
+        if (Emit.init_code != null) {
             ErrorManager.getManager().emit_warning("Redundant init code (skipping)");
         } else { /* save the user code */
-            emit.init_code = attach_debug_symbol(get_new_debug_id(), user_code);
+            Emit.init_code = attach_debug_symbol(get_new_debug_id(), user_code);
         }
     :}
     ;
@@ -415,10 +415,10 @@ init_code ::=
 scan_code ::=
     SCAN WITH CODE_STRING:user_code opt_semi
     {:
-        if (emit.scan_code != null) {
+        if (Emit.scan_code != null) {
             ErrorManager.getManager().emit_warning("Redundant scan code (skipping)");
         } else { /* save the user code */
-            emit.scan_code = attach_debug_symbol(get_new_debug_id(),user_code);
+            Emit.scan_code = attach_debug_symbol(get_new_debug_id(),user_code);
         }
     :}
     ;
@@ -579,8 +579,8 @@ start_spec ::=
             new_rhs();
             add_rhs_part(add_lab(new SymbolPart(start_nt), "start_val"));
             add_rhs_part(new SymbolPart(Terminal.EOF));
-            if (!emit._xmlactions) add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
-            emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
+            if (!Emit._xmlactions) add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
+            Emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
             new_rhs();
         }
     :}
@@ -663,16 +663,16 @@ rhs ::=
                 new_rhs();
                 add_rhs_part(add_lab(new SymbolPart(start_nt), "start_val"));
                 add_rhs_part(new SymbolPart(Terminal.EOF));
-                if (!emit._xmlactions) {
+                if (!Emit._xmlactions) {
                     add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
                 }
                 if (sym instanceof Terminal) {
-                    emit.start_production = new Production(
+                    Emit.start_production = new Production(
                         NonTerminal.START_NT, rhs_parts, rhs_pos,
                         ((Terminal) sym).precedence(),
                         ((Terminal) sym).associativity());
                 } else {
-                    emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
+                    Emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
                 }
                 new_rhs();
             }
@@ -698,10 +698,10 @@ rhs ::=
                 new_rhs();
                 add_rhs_part(add_lab(new SymbolPart(start_nt), "start_val"));
                 add_rhs_part(new SymbolPart(Terminal.EOF));
-                if (!emit._xmlactions) {
+                if (!Emit._xmlactions) {
                     add_rhs_part(new ActionPart("\t\tRESULT = start_val;"));
                 }
-                emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
+                Emit.start_production = new Production(NonTerminal.START_NT, rhs_parts, rhs_pos);
                 new_rhs();
             }
         }
