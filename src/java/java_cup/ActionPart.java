@@ -1,6 +1,8 @@
 
 package java_cup;
 
+import java.util.Objects;
+
 /**
  * This class represents a part of a production which contains an
  * action.  These are eventually eliminated from productions and converted
@@ -14,19 +16,9 @@ package java_cup;
 public class ActionPart extends ProductionPart {
 
     /**
-     * Simple constructor.
-     *
-     * @param code string containing the actual user code.
-     */
-    public ActionPart(String code) {
-        super(/* never have a label on code */null);
-        this.code = code;
-    }
-
-    /**
      * String containing code for the action in question.
      */
-    protected String code;
+    protected final String code;
 
     /**
      * String containing code for the action in question.
@@ -36,10 +28,13 @@ public class ActionPart extends ProductionPart {
     }
 
     /**
-     * Set the code string.
+     * Simple constructor.
+     *
+     * @param code string containing the actual user code.
      */
-    public void setCode(String code) {
-        this.code = code;
+    public ActionPart(String code) {
+        super(/* never have a label on code */ null);
+        this.code = Objects.requireNonNull(code);
     }
 
     /**
@@ -51,23 +46,15 @@ public class ActionPart extends ProductionPart {
     }
 
     /**
-     * Equality comparison for properly typed object.
-     */
-    public boolean equals(ActionPart other) {
-        /* compare the strings */
-        return other != null && super.equals(other) &&
-               other.code().equals(code());
-    }
-
-    /**
      * Generic equality comparison.
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof ActionPart))
-            return false;
-        else
-            return equals((ActionPart) other);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        ActionPart that = (ActionPart) o;
+        return Objects.equals(code, that.code);
     }
 
     /**
@@ -75,8 +62,7 @@ public class ActionPart extends ProductionPart {
      */
     @Override
     public int hashCode() {
-        return super.hashCode() ^
-               (code() == null ? 0 : code().hashCode());
+        return Objects.hash(super.hashCode(), code);
     }
 
     /**
@@ -84,6 +70,6 @@ public class ActionPart extends ProductionPart {
      */
     @Override
     public String toString() {
-        return super.toString() + "{" + code() + "}";
+        return super.toString() + "{: " + code + " :}";
     }
 }

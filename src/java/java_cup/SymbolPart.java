@@ -1,5 +1,7 @@
 package java_cup;
 
+import java.util.Objects;
+
 /**
  * This class represents a part of a production which is a symbol (terminal or
  * non terminal). This simply maintains a reference to the symbol in question.
@@ -11,6 +13,18 @@ package java_cup;
 public class SymbolPart extends ProductionPart {
 
     /**
+     * The symbol that this part is made up of.
+     */
+    protected final Cymbol symbol;
+
+    /**
+     * The symbol that this part is made up of.
+     */
+    public Cymbol symbol() {
+        return symbol;
+    }
+
+    /**
      * Full constructor.
      *
      * @param symbol the symbol that this part is made up of.
@@ -18,10 +32,7 @@ public class SymbolPart extends ProductionPart {
      */
     public SymbolPart(Cymbol symbol, String label) throws internal_error {
         super(label);
-
-        if (symbol == null)
-            throw new internal_error("Attempt to construct a symbol_part with a null symbol");
-        this.symbol = symbol;
+        this.symbol = Objects.requireNonNull(symbol);
     }
 
     /**
@@ -34,18 +45,6 @@ public class SymbolPart extends ProductionPart {
     }
 
     /**
-     * The symbol that this part is made up of.
-     */
-    protected Cymbol symbol;
-
-    /**
-     * The symbol that this part is made up of.
-     */
-    public Cymbol symbol() {
-        return symbol;
-    }
-
-    /**
      * Respond that we are not an action part.
      */
     @Override
@@ -54,21 +53,15 @@ public class SymbolPart extends ProductionPart {
     }
 
     /**
-     * Equality comparison.
-     */
-    public boolean equals(SymbolPart other) {
-        return other != null && super.equals(other) && symbol().equals(other.symbol());
-    }
-
-    /**
      * Generic equality comparison.
      */
     @Override
-    public boolean equals(Object other) {
-        if (!(other instanceof SymbolPart))
-            return false;
-        else
-            return equals((SymbolPart) other);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        SymbolPart that = (SymbolPart) o;
+        return Objects.equals(symbol, that.symbol);
     }
 
     /**
@@ -76,7 +69,7 @@ public class SymbolPart extends ProductionPart {
      */
     @Override
     public int hashCode() {
-        return super.hashCode() ^ (symbol() == null ? 0 : symbol().hashCode());
+        return Objects.hash(super.hashCode(), symbol);
     }
 
     /**
@@ -84,9 +77,6 @@ public class SymbolPart extends ProductionPart {
      */
     @Override
     public String toString() {
-        if (symbol() != null)
-            return super.toString() + symbol();
-        else
-            return super.toString() + "$MISSING-SYMBOL$";
+        return super.toString() + symbol;
     }
 }
