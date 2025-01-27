@@ -829,7 +829,7 @@ public class Main {
 
     dump_file.println("===== Non terminals =====");
     for (int nidx = 0, cnt = 0; nidx < NonTerminal.size(); nidx++, cnt++) {
-      dump_file.print("[" + nidx + "]" + NonTerminal.find(nidx).name() + " ");
+      dump_file.print("[" + nidx + "]" + NonTerminal.findByIndex(nidx).name() + " ");
       if ((cnt + 1) % 5 == 0)
         dump_file.println();
     }

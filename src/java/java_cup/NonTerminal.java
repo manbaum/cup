@@ -14,30 +14,32 @@ import java.util.HashMap;
 public class NonTerminal extends Cymbol {
 
     /**
+     * flag non-terminals created to embed action productions
+     */
+    public boolean isEmbeddedAction = false; /* added 24-Mar-1998, CSA */
+
+    /**
      * Full constructor.
      *
      * @param name     the name of the non terminal.
      * @param javaType the type string for the non terminal.
      */
+    private NonTerminal(int index, String name, String javaType) {
+        super(index, name, javaType);
+    }
+
+    /**
+     * Static counter to assign unique indexes.
+     */
+    protected static int nextIndex = 0;
+
     public NonTerminal(String name, String javaType) {
         /* super class does most of the work */
-        super(name, javaType);
+        /* assign a unique index */
+        super(nextIndex++, name, javaType);
 
         /* add to set of all non terminals and check for duplicates */
-        Object conflict = byName.put(name, this);
-        if (conflict != null) {
-            // can't throw an exception here because these are used in static
-            // initializers, so we crash instead
-            // was:
-            // throw new internal_error("Duplicate non-terminal ("+nm+") created");
-            (new internal_error("Duplicate non-terminal (" + name + ") created")).crash();
-        }
-
-        /* assign a unique index */
-        index = nextIndex++;
-
-        /* add to by_index set */
-        byIndex.put(index, this);
+        register(this);
     }
 
     /**
@@ -54,41 +56,16 @@ public class NonTerminal extends Cymbol {
      * key
      */
     protected static HashMap<String, NonTerminal> byName = new HashMap<>();
-
-    // Hm Added clear to clear all static fields
-    public static void clear() {
-        byName.clear();
-        byIndex.clear();
-        nextIndex = 1;
-        nextNT = 0;
-        byName.put(START_NT.name, START_NT);
-        byIndex.put(Integer.valueOf(START_NT.index), START_NT);
-    }
-
-    /**
-     * Access to all non-terminals.
-     */
-    public static Iterable<NonTerminal> all() {
-        return byName.values();
-    }
-
-    /**
-     * lookup a non terminal by name string
-     */
-    public static NonTerminal findByName(String name) {
-        return byName.get(name);
-    }
-
     /**
      * Table of all non terminals indexed by their index number.
      */
     protected static HashMap<Integer, NonTerminal> byIndex = new HashMap<>();
 
     /**
-     * Lookup a non terminal by index.
+     * Access to all non-terminals.
      */
-    public static NonTerminal find(int index) {
-        return byIndex.get(index);
+    public static Iterable<NonTerminal> all() {
+        return byName.values();
     }
 
     /**
@@ -99,14 +76,42 @@ public class NonTerminal extends Cymbol {
     }
 
     /**
-     * Static counter to assign unique indexes.
+     * lookup a non terminal by name string
      */
-    protected static int nextIndex = 0;
+    public static NonTerminal findByName(String name) {
+        return byName.get(name);
+    }
 
     /**
-     * Static counter for creating unique non-terminal names
+     * Lookup a non terminal by index.
      */
-    static protected int nextNT = 0;
+    public static NonTerminal findByIndex(int index) {
+        return byIndex.get(index);
+    }
+
+    public static void register(NonTerminal nt) {
+        /* add to set of all non terminals and check for duplicates */
+        Object conflict = byName.put(nt.name, nt);
+        if (conflict != null) {
+            // can't throw an exception here because these are used in static
+            // initializers, so we crash instead
+            // was:
+            // throw new internal_error("Duplicate non-terminal ("+nm+") created");
+            (new internal_error("Duplicate non-terminal (" + nt.name + ") created")).crash();
+        }
+
+        /* add to by_index set */
+        byIndex.put(nt.index, nt);
+    }
+
+    // Hm Added clear to clear all static fields
+    public static void clear() {
+        byName.clear();
+        byIndex.clear();
+        nextIndex = 1;
+        nextNT = 0;
+        register(START_NT);
+    }
 
     /**
      * special non-terminal for start symbol
@@ -114,9 +119,17 @@ public class NonTerminal extends Cymbol {
     public static final NonTerminal START_NT = new NonTerminal("$START");
 
     /**
-     * flag non-terminals created to embed action productions
+     * Static counter for creating unique non-terminal names
      */
-    public boolean isEmbeddedAction = false; /* added 24-Mar-1998, CSA */
+    static protected int nextNT = 0;
+
+    /**
+     * TUM 20060608 bugfix for embedded action codes
+     */
+    static NonTerminal createNT(String prefix, String type) throws internal_error {
+        if (prefix == null) prefix = "NT$";
+        return new NonTerminal(prefix + nextNT++, type);
+    }
 
     /**
      * Method for creating a new uniquely named hidden non-terminal using the given
@@ -133,69 +146,6 @@ public class NonTerminal extends Cymbol {
      */
     static NonTerminal createNT() throws internal_error {
         return createNT(null);
-    }
-
-    /**
-     * TUM 20060608 bugfix for embedded action codes
-     */
-    static NonTerminal createNT(String prefix, String type) throws internal_error {
-        if (prefix == null)
-            prefix = "NT$";
-        return new NonTerminal(prefix + nextNT++, type);
-    }
-
-    /**
-     * Compute nullability of all non-terminals.
-     */
-    public static void computeNullability() throws internal_error {
-        boolean change = true;
-        /* repeat this process until there is no change */
-        while (change) {
-            /* look for a new change */
-            change = false;
-
-            /* consider each non-terminal */
-            for (NonTerminal nt : all())
-                /* only look at things that aren't already marked nullable */
-                if (!nt.nullable())
-                    if (nt.looksNullable()) {
-                        nt.nullable = true;
-                        change = true;
-                    }
-
-        }
-
-        /* do one last pass over the productions to finalize all of them */
-        for (Production prod : Production.all())
-            prod.set_nullable(prod.check_nullable());
-    }
-
-    /**
-     * Compute first sets for all non-terminals. This assumes nullability has
-     * already computed.
-     */
-    public static void computeFirstSet() throws internal_error {
-        boolean change = true;
-        /* repeat this process until we have no change */
-        while (change) {
-            /* look for a new change */
-            change = false;
-
-            /* consider each non-terminal */
-            for (NonTerminal nt : all()) {
-                /* consider every production of that non terminal */
-                for (Production prod : nt.productions()) {
-                    /* get the updated first of that production */
-                    TerminalSet prod_first = prod.check_first_set();
-
-                    /* if this going to add anything, add it */
-                    if (!prod_first.isSubsetOf(nt.firstSet)) {
-                        change = true;
-                        nt.firstSet.addAll(prod_first);
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -254,17 +204,9 @@ public class NonTerminal extends Cymbol {
     }
 
     /**
-     * Indicate that this symbol is a non-terminal.
-     */
-    @Override
-    public boolean isNonTerm() {
-        return true;
-    }
-
-    /**
      * Test to see if this non terminal currently looks nullable.
      */
-    protected boolean looksNullable() throws internal_error {
+    private boolean looksNullable() throws internal_error {
         /* look and see if any of the productions now look nullable */
         for (Production prod : productions())
             /* if the production can go to empty, we are nullable */
@@ -276,10 +218,72 @@ public class NonTerminal extends Cymbol {
     }
 
     /**
+     * Compute nullability of all non-terminals.
+     */
+    public static void computeNullability() throws internal_error {
+        boolean change = true;
+        /* repeat this process until there is no change */
+        while (change) {
+            /* look for a new change */
+            change = false;
+
+            /* consider each non-terminal */
+            for (NonTerminal nt : all())
+                /* only look at things that aren't already marked nullable */
+                if (!nt.nullable())
+                    if (nt.looksNullable()) {
+                        nt.nullable = true;
+                        change = true;
+                    }
+
+        }
+
+        /* do one last pass over the productions to finalize all of them */
+        for (Production prod : Production.all())
+            prod.set_nullable(prod.check_nullable());
+    }
+
+    /**
+     * Compute first sets for all non-terminals. This assumes nullability has
+     * already computed.
+     */
+    public static void computeFirstSet() throws internal_error {
+        boolean change = true;
+        /* repeat this process until we have no change */
+        while (change) {
+            /* look for a new change */
+            change = false;
+
+            /* consider each non-terminal */
+            for (NonTerminal nt : all()) {
+                /* consider every production of that non terminal */
+                for (Production prod : nt.productions()) {
+                    /* get the updated first of that production */
+                    TerminalSet prod_first = prod.check_first_set();
+
+                    /* if this going to add anything, add it */
+                    if (!prod_first.isSubsetOf(nt.firstSet)) {
+                        change = true;
+                        nt.firstSet.addAll(prod_first);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Indicate that this symbol is a non-terminal.
+     */
+    @Override
+    public boolean isNonTerm() {
+        return true;
+    }
+
+    /**
      * convert to string
      */
     @Override
     public String toString() {
-        return super.toString() + "[" + index() + "]" + (nullable() ? "*" : "");
+        return name + '[' + index + ']' + (nullable ? "*" : "");
     }
 }

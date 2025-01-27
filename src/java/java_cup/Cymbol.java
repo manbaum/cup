@@ -19,31 +19,25 @@ import java.util.Objects;
 public abstract class Cymbol {
 
     /**
-     * Full constructor.
-     *
-     * @param name     the name of the symbol.
-     * @param javaType a string with the type name.
+     * Index of this symbol (terminal or non terminal) in the parse tables. Note:
+     * indexes are unique among terminals and unique among non terminals, however, a
+     * terminal may have the same index as a non-terminal, etc.
      */
-    public Cymbol(String name, String javaType) {
-        /* sanity check */
-        this.name = Objects.requireNonNull(name);
-        /* apply default if no type given */
-        this.javaType = javaType != null ? javaType : "Object";
-    }
+    protected final int index;
 
     /**
-     * Constructor with default type.
-     *
-     * @param name the name of the symbol.
+     * Index of this symbol (terminal or non terminal) in the parse tables. Note:
+     * indexes are unique among terminals and unique among non terminals, however, a
+     * terminal may have the same index as a non-terminal, etc.
      */
-    public Cymbol(String name) {
-        this(name, null);
+    public int index() {
+        return index;
     }
 
     /**
      * String for the human readable name of the symbol.
      */
-    protected String name;
+    protected final String name;
 
     /**
      * String for the human readable name of the symbol.
@@ -55,13 +49,36 @@ public abstract class Cymbol {
     /**
      * String for the type of object used for the symbol on the parse stack.
      */
-    protected String javaType;
+    protected final String javaType;
 
     /**
      * String for the type of object used for the symbol on the parse stack.
      */
     public String javaType() {
         return javaType;
+    }
+
+    /**
+     * Full constructor.
+     *
+     * @param name     the name of the symbol.
+     * @param javaType a string with the type name.
+     */
+    public Cymbol(int index, String name, String javaType) {
+        this.index = index;
+        /* sanity check */
+        this.name = Objects.requireNonNull(name);
+        /* apply default if no type given */
+        this.javaType = javaType != null ? javaType : "Object";
+    }
+
+    /**
+     * Constructor with default type.
+     *
+     * @param name the name of the symbol.
+     */
+    public Cymbol(int index, String name) {
+        this(index, name, null);
     }
 
     /**
@@ -81,22 +98,6 @@ public abstract class Cymbol {
      */
     public void noteUse() {
         useCount++;
-    }
-
-    /**
-     * Index of this symbol (terminal or non terminal) in the parse tables. Note:
-     * indexes are unique among terminals and unique among non terminals, however, a
-     * terminal may have the same index as a non-terminal, etc.
-     */
-    protected int index;
-
-    /**
-     * Index of this symbol (terminal or non terminal) in the parse tables. Note:
-     * indexes are unique among terminals and unique among non terminals, however, a
-     * terminal may have the same index as a non-terminal, etc.
-     */
-    public int index() {
-        return index;
     }
 
     /**
