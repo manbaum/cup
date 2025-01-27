@@ -454,7 +454,7 @@ public class lalr_state {
         /* consider each lookahead symbol */
         for (int t = 0; t < Terminal.size(); t++) {
           /* skip over the ones not in the lookahead */
-          if (!itm.lookahead().contains(t))
+          if (!itm.lookahead().containsIndex(t))
             continue;
 
           /* if we don't already have an action put this one in */
@@ -671,7 +671,7 @@ public class lalr_state {
         /* report S/R conflicts under all the symbols we conflict under */
         TerminalSet lookahead = itm.lookahead();
         for (int t = 0; t < Terminal.size(); t++)
-          if (conflict_set.contains(t) && lookahead.contains(t))
+          if (conflict_set.containsIndex(t) && lookahead.containsIndex(t))
             report_shift_reduce(itm, t);
       }
     }
@@ -691,7 +691,7 @@ public class lalr_state {
     String message = "*** Reduce/Reduce conflict found in state #" + index() + "\n" + "  between "
         + itm1.to_simple_string() + "\n" + "  and     " + itm2.to_simple_string() + "\n" + "  under symbols: {";
     for (int t = 0; t < Terminal.size(); t++) {
-      if (itm1.lookahead().contains(t) && itm2.lookahead().contains(t)) {
+      if (itm1.lookahead().containsIndex(t) && itm2.lookahead().containsIndex(t)) {
         if (comma_flag)
           message += (", ");
         else

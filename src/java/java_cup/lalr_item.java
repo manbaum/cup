@@ -314,7 +314,7 @@ public class lalr_item extends lr_item_core {
     if (lookahead() != null) {
       res.append("{");
       for (int t = 0; t < Terminal.size(); t++)
-        if (lookahead().contains(t))
+        if (lookahead().containsIndex(t))
           res.append(Terminal.findByIndex(t).name() + " ");
       res.append("}");
     } else
